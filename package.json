@@ -1,7 +1,7 @@
 {
   "name": "stability-ai",
   "version": "0.1.0",
-  "description": "Stability AI REST API SDK",
+  "description": "Node SDK for Stability AI REST API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -17,10 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jbeoris/stability-ai.git"
+    "url": "git+https://github.com/jbeoris/stability-ai-node-sdk.git"
   },
   "keywords": [
     "stability-ai",
+    "stability-ai-node-sdk",
+    "stability",
     "ai"
   ],
   "author": {
@@ -30,9 +32,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jbeoris/stability-ai/issues"
+    "url": "https://github.com/jbeoris/stability-ai-node-sdk/issues"
   },
-  "homepage": "https://github.com/jbeoris/stability-ai#readme",
+  "homepage": "https://github.com/jbeoris/stability-ai-node-sdk#readme",
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.3",

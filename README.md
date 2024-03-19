@@ -1,4 +1,4 @@
-# stability-ai
+# stability-ai-node-sdk
 
 A TypeScript / JavaScript library for the Stability AI REST API.
 
