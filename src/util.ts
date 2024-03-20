@@ -17,6 +17,9 @@ export type OutputFormat = 'jpeg' | 'png' | 'webp';
 
 export type StabilityAIContentResult = {
   filepath: string;
+  filename: string;
+  content_type: 'image' | 'video';
+  output_format: OutputFormat | 'mp4';
   content_filtered: boolean;
   errored: boolean;
   seed: number;

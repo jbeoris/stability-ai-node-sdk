@@ -141,6 +141,9 @@ export async function upscaleResult(
 
     return {
       filepath,
+      filename,
+      content_type: 'image',
+      output_format: outputFormat || 'png',
       content_filtered: finishReason === 'CONTENT_FILTERED',
       errored: false,
       seed: response.data.seed,
@@ -253,6 +256,9 @@ export async function inpaint(
 
     return {
       filepath,
+      filename,
+      content_type: 'image',
+      output_format: options.output_format || 'png',
       content_filtered: finishReason === 'CONTENT_FILTERED',
       errored: false,
       seed: response.data.seed,
@@ -371,6 +377,9 @@ export async function imageToVideoResult(
 
     return {
       filepath,
+      filename,
+      content_type: 'video',
+      output_format: 'mp4',
       content_filtered: finishReason === 'CONTENT_FILTERED',
       errored: false,
       seed: response.data.seed,

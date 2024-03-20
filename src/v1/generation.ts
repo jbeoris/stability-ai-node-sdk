@@ -5,7 +5,6 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import FormData from 'form-data';
 import {
-  OutputFormat,
   APIVersion,
   StabilityAIError,
   StabilityAIContentResult,
@@ -110,6 +109,9 @@ async function processArtifacts(
 
     results.push({
       filepath,
+      filename,
+      content_type: 'image',
+      output_format: 'png',
       content_filtered: finishReason === 'CONTENT_FILTERED',
       errored: finishReason === 'ERROR',
       seed: artifact.seed,
