@@ -170,9 +170,12 @@ console.log('4k Upscale result filepath:', filepath)
 
 ```typescript
 const result = await stability.v2Alpha.generation.inpaint(
-  { mode: 'search', search_prompt: 'the earth' },
   'https://www.example.com/images/your-image-of-the-earth.png',
-  'disco ball'
+  'disco ball',
+  {
+    mode: 'search',
+    search_prompt: 'the earth'
+  }
 );
 
 console.log('Inpaint result filepath:', result.filepath);
