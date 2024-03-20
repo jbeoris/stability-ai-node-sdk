@@ -4,7 +4,12 @@ import os from 'os';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import FormData from 'form-data';
-import { OutputFormat, APIVersion, StabilityAIError, StabilityAIContentResult } from '../util';
+import {
+  OutputFormat,
+  APIVersion,
+  StabilityAIError,
+  StabilityAIContentResult,
+} from '../util';
 import * as Util from '../util';
 import StabilityAI from '..';
 
@@ -21,13 +26,15 @@ enum Endpoints {
 export type UpscaleOptions = [
   image: string,
   prompt: string,
-  negativePrompt?: string,
-  outputFormat?: OutputFormat,
-  seed?: number,
-  creativity?: number, // 0-0.35
+  options?: {
+    negative_prompt?: string;
+    output_format?: OutputFormat;
+    seed?: number;
+    creativity?: number; // 0-0.35
+  },
 ];
 
-export type UpscaleRepsonse = Promise<{ id: string; output_format: OutputFormat }>;
+export type UpscaleRepsonse = { id: string; output_format: OutputFormat };
 
 /**
  * Stability AI Stable Image Upscale (v2Alpha)
@@ -39,8 +46,11 @@ export type UpscaleRepsonse = Promise<{ id: string; output_format: OutputFormat 
  * @param seed - Seed for the upscaling
  * @param creativity - Creativity for the upscaling (0-0.35)
  */
-export async function upscale(this: StabilityAI, ...args: UpscaleOptions): UpscaleRepsonse {
-  const [image, prompt, negativePrompt, outputFormat, seed, creativity] = args;
+export async function upscale(
+  this: StabilityAI,
+  ...args: UpscaleOptions
+): Promise<UpscaleRepsonse> {
+  const [image, prompt, options] = args;
   const filepath = await Util.downloadImage(image);
 
   const formData: {
@@ -55,10 +65,11 @@ export async function upscale(this: StabilityAI, ...args: UpscaleOptions): Upsca
     prompt,
   };
 
-  if (negativePrompt) formData.negative_prompt = negativePrompt;
-  if (outputFormat) formData.output_format = outputFormat;
-  if (seed) formData.seed = seed;
-  if (creativity) formData.creativity = creativity;
+  if (options?.negative_prompt)
+    formData.negative_prompt = options.negative_prompt;
+  if (options?.output_format) formData.output_format = options.output_format;
+  if (options?.seed) formData.seed = options.seed;
+  if (options?.creativity) formData.creativity = options.creativity;
 
   const response = await axios.postForm(
     Util.makeUrl(APIVersion.V2_ALPHA, RESOURCE, Endpoints.STABLE_IMAGE_UPSCALE),
@@ -72,15 +83,24 @@ export async function upscale(this: StabilityAI, ...args: UpscaleOptions): Upsca
   fs.unlinkSync(filepath);
 
   if (response.status === 200 && typeof response.data.id === 'string') {
-    return { id: response.data.id, output_format: outputFormat || 'png' };
+    return {
+      id: response.data.id,
+      output_format: options?.output_format || 'png',
+    };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to start upscale', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to start upscale',
+    response.data,
+  );
 }
 
-export type UpscaleResultOptions = [id: string, output_format: OutputFormat];
+export type UpscaleResultOptions = [id: string, outputFormat: OutputFormat];
 
-export type UpscaleResultResponse = Promise<StabilityAIContentResult | { id: string; status: 'in-progress' }>;
+export type UpscaleResultResponse =
+  | StabilityAIContentResult
+  | { id: string; status: 'in-progress' };
 
 /**
  * Stability AI Stable Image Upscale Result (v2Alpha)
@@ -89,10 +109,17 @@ export type UpscaleResultResponse = Promise<StabilityAIContentResult | { id: str
  * @param output_format - Output format requested in original upscale request
  * @returns
  */
-export async function upscaleResult(this: StabilityAI, ...args: UpscaleResultOptions): UpscaleResultResponse {
+export async function upscaleResult(
+  this: StabilityAI,
+  ...args: UpscaleResultOptions
+): Promise<UpscaleResultResponse> {
   const [id, outputFormat] = args;
   const response = await axios.get(
-    Util.makeUrl(APIVersion.V2_ALPHA, RESOURCE, Endpoints.STABLE_IMAGE_UPSCALE_RESULT) + `/${id}`,
+    Util.makeUrl(
+      APIVersion.V2_ALPHA,
+      RESOURCE,
+      Endpoints.STABLE_IMAGE_UPSCALE_RESULT,
+    ) + `/${id}`,
     {
       validateStatus: undefined,
       headers: {
@@ -104,7 +131,8 @@ export async function upscaleResult(this: StabilityAI, ...args: UpscaleResultOpt
 
   if (response.status === 200) {
     const image = response.data.image;
-    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' = response.data.finish_reason;
+    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' =
+      response.data.finish_reason;
 
     const filename = `${uuidv4()}.${outputFormat || 'png'}`;
     const filepath = path.join(os.tmpdir(), filename);
@@ -126,30 +154,49 @@ export async function upscaleResult(this: StabilityAI, ...args: UpscaleResultOpt
     return { id, status };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to fetch upscale result', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to fetch upscale result',
+    response.data,
+  );
 }
 
 export type InpaintOptions = [
-  modeOptions: { mode: 'mask'; mask?: string } | { mode: 'search'; search_prompt: string },
   image: string,
   prompt: string,
-  negative_prompt?: string,
-  seed?: number,
-  output_format?: OutputFormat,
+  options: (
+    | {
+        mode: 'mask';
+        mask?: string;
+      }
+    | {
+        mode: 'search';
+        search_prompt: string;
+      }
+  ) & {
+    negative_prompt?: string;
+    seed?: number;
+    output_format?: OutputFormat;
+  },
 ];
 
-export type InpaintResponse = Promise<StabilityAIContentResult>;
+export type InpaintResponse = StabilityAIContentResult;
 
 /**
  * Stability AI Stable Image Inpaint (v2Alpha)
  *
  * @param options - Inpaint Options
  */
-export async function inpaint(this: StabilityAI, ...args: InpaintOptions): InpaintResponse {
-  const [modeOptions, image, prompt, negativePrompt, seed, outputFormat] = args;
+export async function inpaint(
+  this: StabilityAI,
+  ...args: InpaintOptions
+): Promise<InpaintResponse> {
+  const [image, prompt, options] = args;
   const imageFilepath = await Util.downloadImage(image);
   const maskFilepath =
-    modeOptions.mode === 'mask' && modeOptions.mask ? await Util.downloadImage(modeOptions.mask) : undefined;
+    options.mode === 'mask' && options.mask
+      ? await Util.downloadImage(options.mask)
+      : undefined;
 
   const formData: {
     mode: string;
@@ -161,20 +208,21 @@ export async function inpaint(this: StabilityAI, ...args: InpaintOptions): Inpai
     mask?: fs.ReadStream;
     search_prompt?: string;
   } = {
-    mode: modeOptions.mode,
+    mode: options.mode,
     image: fs.createReadStream(imageFilepath),
     prompt,
   };
-  if (negativePrompt) formData.negative_prompt = negativePrompt;
-  if (seed) formData.seed = seed;
-  if (outputFormat) formData.output_format = outputFormat;
+  if (options.negative_prompt)
+    formData.negative_prompt = options.negative_prompt;
+  if (options.seed) formData.seed = options.seed;
+  if (options.output_format) formData.output_format = options.output_format;
 
-  switch (modeOptions.mode) {
+  switch (options.mode) {
     case 'mask':
       if (maskFilepath) formData.mask = fs.createReadStream(maskFilepath);
       break;
     case 'search':
-      formData.search_prompt = modeOptions.search_prompt;
+      formData.search_prompt = options.search_prompt;
       break;
   }
 
@@ -195,9 +243,10 @@ export async function inpaint(this: StabilityAI, ...args: InpaintOptions): Inpai
 
   if (response.status === 200) {
     const image = response.data.image;
-    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' = response.data.finish_reason;
+    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' =
+      response.data.finish_reason;
 
-    const filename = `${uuidv4()}.${outputFormat || 'png'}`;
+    const filename = `${uuidv4()}.${options.output_format || 'png'}`;
     const filepath = path.join(os.tmpdir(), filename);
 
     await fs.writeFile(filepath, image, 'base64');
@@ -210,20 +259,34 @@ export async function inpaint(this: StabilityAI, ...args: InpaintOptions): Inpai
     };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to run inpaint', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run inpaint',
+    response.data,
+  );
 }
 
-export type ImageToVideoOptions = [image: string, seed?: number, motion_bucket_id?: number, cfg_scale?: number];
+export type ImageToVideoOptions = [
+  image: string,
+  options?: {
+    seed?: number;
+    motion_bucket_id?: number;
+    cfg_scale?: number;
+  },
+];
 
-export type ImageToVideoResponse = Promise<{ id: string }>;
+export type ImageToVideoResponse = { id: string };
 
 /**
  * Stability AI Image to Video (v2Alpha)
  *
  * @param options - Image to Video Options
  */
-export async function imageToVideo(this: StabilityAI, ...args: ImageToVideoOptions): ImageToVideoResponse {
-  const [image, seed, motionBucketId, cfgScale] = args;
+export async function imageToVideo(
+  this: StabilityAI,
+  ...args: ImageToVideoOptions
+): Promise<ImageToVideoResponse> {
+  const [image, options] = args;
   const imageFilepath = await Util.downloadImage(image);
 
   const formData: {
@@ -234,9 +297,10 @@ export async function imageToVideo(this: StabilityAI, ...args: ImageToVideoOptio
   } = {
     image: fs.createReadStream(imageFilepath),
   };
-  if (seed) formData.seed = seed;
-  if (motionBucketId) formData.motion_bucket_id = motionBucketId;
-  if (cfgScale) formData.cfg_scale = cfgScale;
+  if (options?.seed) formData.seed = options.seed;
+  if (options?.motion_bucket_id)
+    formData.motion_bucket_id = options.motion_bucket_id;
+  if (options?.cfg_scale) formData.cfg_scale = options.cfg_scale;
 
   const response = await axios.postForm(
     Util.makeUrl(APIVersion.V2_ALPHA, RESOURCE, Endpoints.IMAGE_TO_VIDEO),
@@ -256,12 +320,18 @@ export async function imageToVideo(this: StabilityAI, ...args: ImageToVideoOptio
     return { id: response.data.id };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to start image to video', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to start image to video',
+    response.data,
+  );
 }
 
 export type ImageToVideoResultOptions = [id: string];
 
-export type ImageToVideoResultResponse = Promise<StabilityAIContentResult | { id: string; status: 'in-progress' }>;
+export type ImageToVideoResultResponse =
+  | StabilityAIContentResult
+  | { id: string; status: 'in-progress' };
 
 /**
  * Stability AI Stable Image To Video Result (v2Alpha)
@@ -272,10 +342,14 @@ export type ImageToVideoResultResponse = Promise<StabilityAIContentResult | { id
 export async function imageToVideoResult(
   this: StabilityAI,
   ...args: ImageToVideoResultOptions
-): ImageToVideoResultResponse {
+): Promise<ImageToVideoResultResponse> {
   const [id] = args;
   const response = await axios.get(
-    Util.makeUrl(APIVersion.V2_ALPHA, RESOURCE, Endpoints.IMAGE_TO_VIDEO_RESULT) + `/${id}`,
+    Util.makeUrl(
+      APIVersion.V2_ALPHA,
+      RESOURCE,
+      Endpoints.IMAGE_TO_VIDEO_RESULT,
+    ) + `/${id}`,
     {
       validateStatus: undefined,
       headers: {
@@ -287,7 +361,8 @@ export async function imageToVideoResult(
 
   if (response.status === 200) {
     const video = response.data.video;
-    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' = response.data.finish_reason;
+    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' =
+      response.data.finish_reason;
 
     const filename = `${uuidv4()}.mp4`;
     const filepath = path.join(os.tmpdir(), filename);
@@ -309,5 +384,9 @@ export async function imageToVideoResult(
     return { id, status };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to fetch image to video result', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to fetch image to video result',
+    response.data,
+  );
 }

@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 let stability: StabilityAI | undefined;
-const makeStability = () => new StabilityAI(process.env.STABILITY_AI_API_KEY || '');
+const makeStability = () =>
+  new StabilityAI(process.env.STABILITY_AI_API_KEY || '');
 
 beforeEach(async () => {
   stability = makeStability();
@@ -19,7 +20,8 @@ afterEach(async () => {
 test('Get user account - (v1/user/account)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const { email, id, organizations, profile_picture } = await stability.v1.user.account();
+  const { email, id, organizations, profile_picture } =
+    await stability.v1.user.account();
 
   console.log('User email:', email);
   console.log('User id:', id);
@@ -58,10 +60,13 @@ test('List available engines - (v1/engines/list)', async () => {
 test('Text to image -  (v1/generation/text-to-image)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const results = await stability.v1.generation.textToImage('stable-diffusion-xl-beta-v2-2-2', [
-    { text: 'a man on a horse', weight: 0.5 },
-    { text: 'a giant koala', weight: 0.5 },
-  ]);
+  const results = await stability.v1.generation.textToImage(
+    'stable-diffusion-xl-beta-v2-2-2',
+    [
+      { text: 'a man on a horse', weight: 0.5 },
+      { text: 'a giant koala', weight: 0.5 },
+    ],
+  );
 
   for (const result of results) {
     console.log('Text to image result filepath:', result.filepath);
@@ -134,11 +139,16 @@ test('Image to Video - (v2alpha/generation/image-to-video)', async () => {
   let filepath: string | undefined = undefined;
 
   while (!filepath) {
-    const videoResult = await stability.v2Alpha.generation.imageToVideoResult(result.id);
+    const videoResult = await stability.v2Alpha.generation.imageToVideoResult(
+      result.id,
+    );
 
     if ('filepath' in videoResult) {
       filepath = videoResult.filepath;
-    } else if ('status' in videoResult && videoResult.status === 'in-progress') {
+    } else if (
+      'status' in videoResult &&
+      videoResult.status === 'in-progress'
+    ) {
       await new Promise((resolve) => setTimeout(resolve, 2500));
     }
   }
@@ -159,11 +169,17 @@ test('4k Upscale - (v2alpha/generation/upscale)', async () => {
   let filepath: string | undefined = undefined;
 
   while (!filepath) {
-    const upscaleResult = await stability.v2Alpha.generation.upscaleResult(result.id, result.output_format);
+    const upscaleResult = await stability.v2Alpha.generation.upscaleResult(
+      result.id,
+      result.output_format,
+    );
 
     if ('filepath' in upscaleResult) {
       filepath = upscaleResult.filepath;
-    } else if ('status' in upscaleResult && upscaleResult.status === 'in-progress') {
+    } else if (
+      'status' in upscaleResult &&
+      upscaleResult.status === 'in-progress'
+    ) {
       await new Promise((resolve) => setTimeout(resolve, 2500));
     }
   }
@@ -177,9 +193,12 @@ test('Inpaint - (v2alpha/generation/inpaint)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2Alpha.generation.inpaint(
-    { mode: 'search', search_prompt: 'the earth' },
     'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
     'disco ball',
+    {
+      mode: 'search',
+      search_prompt: 'the earth',
+    },
   );
 
   console.log('Inpaint result filepath:', result.filepath);

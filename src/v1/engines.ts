@@ -16,19 +16,26 @@ export interface Engine {
   type: 'AUDIO' | 'CLASSIFICATION' | 'PICTURE' | 'STORAGE' | 'TEXT' | 'VIDEO';
 }
 
-export type ListResponse = Promise<Engine[]>;
+export type ListResponse = Engine[];
 
 /**
  * Stability List Engines (v1/engines)
  */
-export async function list(this: StabilityAI): ListResponse {
-  const response = await axios.get(SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.LIST), {
-    headers: this.orgAuthHeaders,
-  });
+export async function list(this: StabilityAI): Promise<ListResponse> {
+  const response = await axios.get(
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.LIST),
+    {
+      headers: this.orgAuthHeaders,
+    },
+  );
 
   if (response.status === 200 && Array.isArray(response.data)) {
     return response.data;
   }
 
-  throw new StabilityAIError(response.status, 'Failed to get engines', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to get engines',
+    response.data,
+  );
 }

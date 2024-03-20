@@ -24,7 +24,11 @@ export type StabilityAIContentResult = {
 
 // HELPER FUNCTIONS
 
-export function makeUrl(verison: APIVersion, resource: string, endpoint: string) {
+export function makeUrl(
+  verison: APIVersion,
+  resource: string,
+  endpoint: string,
+) {
   return `${STABILITY_AI_BASE_URL}/${verison}/${resource}/${endpoint}`;
 }
 

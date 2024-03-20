@@ -4,7 +4,12 @@ import os from 'os';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import FormData from 'form-data';
-import { OutputFormat, APIVersion, StabilityAIError, StabilityAIContentResult } from '../util';
+import {
+  OutputFormat,
+  APIVersion,
+  StabilityAIError,
+  StabilityAIContentResult,
+} from '../util';
 import * as Util from '../util';
 import StabilityAI from '..';
 
@@ -24,7 +29,14 @@ export type EngineId =
   | 'stable-diffusion-v1-6'
   | 'stable-diffusion-512-v2-1'
   | 'stable-diffusion-xl-beta-v2-2-2';
-export type ClipGuidancePreset = 'FAST_BLUE' | 'FAST_GREEN' | 'NONE' | 'SIMPLE' | 'SLOW' | 'SLOWER' | 'SLOWEST';
+export type ClipGuidancePreset =
+  | 'FAST_BLUE'
+  | 'FAST_GREEN'
+  | 'NONE'
+  | 'SIMPLE'
+  | 'SLOW'
+  | 'SLOWER'
+  | 'SLOWEST';
 export type Sampler =
   | 'DDIM'
   | 'DDPM'
@@ -56,7 +68,10 @@ export type StylePreset =
   | 'tile-texture';
 export type TextPrompt = { text: string; weight: number };
 
-export type V1GenerationRequiredParams = [engine_id: EngineId, text_prompts: TextPrompt[]];
+export type V1GenerationRequiredParams = [
+  engine_id: EngineId,
+  text_prompts: TextPrompt[],
+];
 
 export type V1GenerationOptionalParams = {
   cfg_scale?: number;
@@ -77,13 +92,16 @@ export type TextToImageOptions = [
   } & V1GenerationOptionalParams,
 ];
 
-export type ContentResultResponse = Promise<StabilityAIContentResult[]>;
+export type ContentResultResponse = StabilityAIContentResult[];
 
-async function processArtifacts(artifacts: any[]): Promise<StabilityAIContentResult[]> {
+async function processArtifacts(
+  artifacts: any[],
+): Promise<StabilityAIContentResult[]> {
   const results: StabilityAIContentResult[] = [];
 
   for (const artifact of artifacts) {
-    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' = artifact.finish_reason;
+    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' =
+      artifact.finish_reason;
 
     const filename = `${uuidv4()}.png`;
     const filepath = path.join(os.tmpdir(), filename);
@@ -107,7 +125,10 @@ async function processArtifacts(artifacts: any[]): Promise<StabilityAIContentRes
  * @param text_prompts - Text prompts to use for generating the image
  * @param options - Additional options for the generation
  */
-export async function textToImage(this: StabilityAI, ...args: TextToImageOptions): ContentResultResponse {
+export async function textToImage(
+  this: StabilityAI,
+  ...args: TextToImageOptions
+): Promise<ContentResultResponse> {
   const [engineId, textPrompts, options] = args;
 
   const body: any = {
@@ -116,7 +137,11 @@ export async function textToImage(this: StabilityAI, ...args: TextToImageOptions
   };
 
   const response = await axios.post(
-    Util.makeUrl(APIVersion.V1, RESOURCE, engineId + '/' + Endpoints.TEXT_TO_IMAGE),
+    Util.makeUrl(
+      APIVersion.V1,
+      RESOURCE,
+      engineId + '/' + Endpoints.TEXT_TO_IMAGE,
+    ),
     body,
     {
       headers: {
@@ -132,7 +157,11 @@ export async function textToImage(this: StabilityAI, ...args: TextToImageOptions
     return processArtifacts(response.data.artifacts);
   }
 
-  throw new StabilityAIError(response.status, 'Failed to run text to image', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run text to image',
+    response.data,
+  );
 }
 
 export type ImageToImageOptions = [
@@ -156,7 +185,10 @@ export type ImageToImageOptions = [
  * Stability AI Image To Image (v1)
  *
  */
-export async function imageToImage(this: StabilityAI, ...args: ImageToImageOptions): ContentResultResponse {
+export async function imageToImage(
+  this: StabilityAI,
+  ...args: ImageToImageOptions
+): Promise<ContentResultResponse> {
   const [engineId, textPrompts, initImage, options] = args;
   const imageFilepath = await Util.downloadImage(initImage);
 
@@ -167,7 +199,11 @@ export async function imageToImage(this: StabilityAI, ...args: ImageToImageOptio
   };
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V1, RESOURCE, engineId + '/' + Endpoints.IMAGE_TO_IMAGE),
+    Util.makeUrl(
+      APIVersion.V1,
+      RESOURCE,
+      engineId + '/' + Endpoints.IMAGE_TO_IMAGE,
+    ),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -182,7 +218,11 @@ export async function imageToImage(this: StabilityAI, ...args: ImageToImageOptio
     return processArtifacts(response.data.artifacts);
   }
 
-  throw new StabilityAIError(response.status, 'Failed to run image to image', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run image to image',
+    response.data,
+  );
 }
 
 export type ImageToImageUpscaleOptions = [
@@ -211,13 +251,16 @@ export type ImageToImageUpscaleOptions = [
 export async function imageToImageUpscale(
   this: StabilityAI,
   ...args: ImageToImageUpscaleOptions
-): ContentResultResponse {
+): Promise<ContentResultResponse> {
   const [image, options] = args;
   const imageFilepath = await Util.downloadImage(image);
 
   const { type, ...typeOptions } = options;
 
-  const engineId = type === 'esrgan' ? 'esrgan-v1-x2plus' : 'stable-diffusion-x4-latent-upscaler';
+  const engineId =
+    type === 'esrgan'
+      ? 'esrgan-v1-x2plus'
+      : 'stable-diffusion-x4-latent-upscaler';
 
   const formData: any = {
     image: fs.createReadStream(imageFilepath),
@@ -225,7 +268,11 @@ export async function imageToImageUpscale(
   };
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V1, RESOURCE, engineId + '/' + Endpoints.IMAGE_TO_IMAGE_UPSCALE),
+    Util.makeUrl(
+      APIVersion.V1,
+      RESOURCE,
+      engineId + '/' + Endpoints.IMAGE_TO_IMAGE_UPSCALE,
+    ),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -240,7 +287,11 @@ export async function imageToImageUpscale(
     return processArtifacts(response.data.artifacts);
   }
 
-  throw new StabilityAIError(response.status, 'Failed to run image to image upscale', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run image to image upscale',
+    response.data,
+  );
 }
 
 export type ImageToImageMaskingOptions = [
@@ -265,7 +316,7 @@ export type ImageToImageMaskingOptions = [
 export async function imageToImageMasking(
   this: StabilityAI,
   ...args: ImageToImageMaskingOptions
-): ContentResultResponse {
+): Promise<ContentResultResponse> {
   const [engineId, textPrompts, initImage, options] = args;
   const imageFilepath = await Util.downloadImage(initImage);
   let maskFilepath: string | undefined = undefined;
@@ -289,7 +340,11 @@ export async function imageToImageMasking(
   if (maskFilepath) formData.mask_image = fs.createReadStream(maskFilepath);
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V1, RESOURCE, engineId + '/' + Endpoints.IMAGE_TO_IMAGE_MASKING),
+    Util.makeUrl(
+      APIVersion.V1,
+      RESOURCE,
+      engineId + '/' + Endpoints.IMAGE_TO_IMAGE_MASKING,
+    ),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -304,5 +359,9 @@ export async function imageToImageMasking(
     return processArtifacts(response.data.artifacts);
   }
 
-  throw new StabilityAIError(response.status, 'Failed to run image to image masking', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run image to image masking',
+    response.data,
+  );
 }

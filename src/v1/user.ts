@@ -17,20 +17,23 @@ export interface Organizations {
   role: string;
 }
 
-export type AccountResponse = Promise<{
+export type AccountResponse = {
   email: string;
   id: string;
   organizations: Organizations[];
   profile_picture?: string;
-}>;
+};
 
 /**
  * Stability Get Balance (v1/user)
  */
-export async function account(this: StabilityAI): AccountResponse {
-  const response = await axios.get(SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.ACCOUNT), {
-    headers: this.authHeaders,
-  });
+export async function account(this: StabilityAI): Promise<AccountResponse> {
+  const response = await axios.get(
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.ACCOUNT),
+    {
+      headers: this.authHeaders,
+    },
+  );
 
   if (
     response.status === 200 &&
@@ -46,18 +49,25 @@ export async function account(this: StabilityAI): AccountResponse {
     };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to get user account', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to get user account',
+    response.data,
+  );
 }
 
-export type BalanceResponse = Promise<{ credits: number }>;
+export type BalanceResponse = { credits: number };
 
 /**
  * Stability Get Balance (v1/user)
  */
-export async function balance(this: StabilityAI): BalanceResponse {
-  const response = await axios.get(SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.BALANCE), {
-    headers: this.orgAuthHeaders,
-  });
+export async function balance(this: StabilityAI): Promise<BalanceResponse> {
+  const response = await axios.get(
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.BALANCE),
+    {
+      headers: this.orgAuthHeaders,
+    },
+  );
 
   if (response.status === 200 && typeof response.data.credits === 'number') {
     return {
@@ -65,5 +75,9 @@ export async function balance(this: StabilityAI): BalanceResponse {
     };
   }
 
-  throw new StabilityAIError(response.status, 'Failed to get user token balance', response.data);
+  throw new StabilityAIError(
+    response.status,
+    'Failed to get user token balance',
+    response.data,
+  );
 }

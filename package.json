@@ -1,6 +1,6 @@
 {
   "name": "stability-ai",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Node SDK for Stability AI REST API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

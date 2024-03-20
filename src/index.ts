@@ -28,27 +28,39 @@ class StabilityAI {
     } = {};
     if (this.organiation) headers.Organization = this.organiation;
     if (this.clientId) headers['Stability-Client-ID'] = this.clientId;
-    if (this.clientVersion) headers['Stability-Client-Version'] = this.clientVersion;
+    if (this.clientVersion)
+      headers['Stability-Client-Version'] = this.clientVersion;
     return _.merge(this.authHeaders, headers);
   }
 
   public get v1() {
     return {
       user: {
-        account: (): V1User.AccountResponse => V1User.account.bind(this)(),
-        balance: (): V1User.BalanceResponse => V1User.balance.bind(this)(),
+        account: (): Promise<V1User.AccountResponse> =>
+          V1User.account.bind(this)(),
+        balance: (): Promise<V1User.BalanceResponse> =>
+          V1User.balance.bind(this)(),
       },
       engines: {
-        list: (): V1Engines.ListResponse => V1Engines.list.bind(this)(),
+        list: (): Promise<V1Engines.ListResponse> =>
+          V1Engines.list.bind(this)(),
       },
       generation: {
-        textToImage: (...args: V1Generation.TextToImageOptions): V1Generation.ContentResultResponse =>
+        textToImage: (
+          ...args: V1Generation.TextToImageOptions
+        ): Promise<V1Generation.ContentResultResponse> =>
           V1Generation.textToImage.bind(this)(...args),
-        imageToImage: (...args: V1Generation.ImageToImageOptions): V1Generation.ContentResultResponse =>
+        imageToImage: (
+          ...args: V1Generation.ImageToImageOptions
+        ): Promise<V1Generation.ContentResultResponse> =>
           V1Generation.imageToImage.bind(this)(...args),
-        imageToImageUpscale: (...args: V1Generation.ImageToImageUpscaleOptions): V1Generation.ContentResultResponse =>
+        imageToImageUpscale: (
+          ...args: V1Generation.ImageToImageUpscaleOptions
+        ): Promise<V1Generation.ContentResultResponse> =>
           V1Generation.imageToImageUpscale.bind(this)(...args),
-        imageToImageMasking: (...args: V1Generation.ImageToImageMaskingOptions): V1Generation.ContentResultResponse =>
+        imageToImageMasking: (
+          ...args: V1Generation.ImageToImageMaskingOptions
+        ): Promise<V1Generation.ContentResultResponse> =>
           V1Generation.imageToImageMasking.bind(this)(...args),
       },
     };
@@ -57,17 +69,26 @@ class StabilityAI {
   public get v2Alpha() {
     return {
       generation: {
-        upscale: (...args: V2AlphaGeneration.UpscaleOptions): V2AlphaGeneration.UpscaleRepsonse =>
+        upscale: (
+          ...args: V2AlphaGeneration.UpscaleOptions
+        ): Promise<V2AlphaGeneration.UpscaleRepsonse> =>
           V2AlphaGeneration.upscale.bind(this)(...args),
-        upscaleResult: (...args: V2AlphaGeneration.UpscaleResultOptions): V2AlphaGeneration.UpscaleResultResponse =>
+        upscaleResult: (
+          ...args: V2AlphaGeneration.UpscaleResultOptions
+        ): Promise<V2AlphaGeneration.UpscaleResultResponse> =>
           V2AlphaGeneration.upscaleResult.bind(this)(...args),
-        inpaint: (...args: V2AlphaGeneration.InpaintOptions): V2AlphaGeneration.InpaintResponse =>
+        inpaint: (
+          ...args: V2AlphaGeneration.InpaintOptions
+        ): Promise<V2AlphaGeneration.InpaintResponse> =>
           V2AlphaGeneration.inpaint.bind(this)(...args),
-        imageToVideo: (...args: V2AlphaGeneration.ImageToVideoOptions): V2AlphaGeneration.ImageToVideoResponse =>
+        imageToVideo: (
+          ...args: V2AlphaGeneration.ImageToVideoOptions
+        ): Promise<V2AlphaGeneration.ImageToVideoResponse> =>
           V2AlphaGeneration.imageToVideo.bind(this)(...args),
         imageToVideoResult: (
           ...args: V2AlphaGeneration.ImageToVideoResultOptions
-        ): V2AlphaGeneration.ImageToVideoResultResponse => V2AlphaGeneration.imageToVideoResult.bind(this)(...args),
+        ): Promise<V2AlphaGeneration.ImageToVideoResultResponse> =>
+          V2AlphaGeneration.imageToVideoResult.bind(this)(...args),
       },
     };
   }
