@@ -1,13 +1,13 @@
 {
   "name": "stability-ai",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Node SDK for Stability AI REST API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "jest --config jestconfig.json --detectOpenHandles",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
