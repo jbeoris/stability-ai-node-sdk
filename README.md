@@ -1,27 +1,181 @@
-# stability-ai-node-sdk
+# Stability AI Node SDK
 
-A TypeScript / JavaScript library for the Stability AI REST API.
+A TypeScript library to easily access the Stability AI REST API.
 
-## Usage
+## Installation
+
+### Yarn
+```bash
+yarn add stability-ai
+```
+### NPM
+```bash
+npm i stability-ai
+```
+
+## General Usage
 
 ```typescript
 import StabilityAI from 'stability-ai';
 
-export const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
+const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
+```
 
-async function inpaintTest() {
-  const result = await stability.v2.generation.inpaint({
-    modeOptions: { mode: 'search', search_prompt: 'the earth' },
-    image: 'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg', // pictue of the earth from outer space
-    prompt: 'disco ball'
-  });
+## User (v1)
 
-  if (!result) throw new Error('Failed to inpaint image!');
+### Account
 
-  return result.filepath;
-};
+```typescript
+const { email, id, organizations, profile_picture } = await stability.v1.user.account()
 
-inpaintText().then((filepath) => console.log('Path to inpainted image:', filepath)).catch(console.error);
+console.log('User email:', email);
+console.log('User id:', id);
+console.log('User organizations:', organizations);
+if (profile_picture) console.log('User profile picture:', profile_picture);
+```
+
+### Balance
+
+```typescript
+const { credits } = await stability.v1.user.balance()
+
+console.log('User credits balance:', credits);
+```
+
+## Engines (v1)
+
+### List
+
+```typescript
+const engines = await stability.v1.engines.list()
+
+console.log('Engine list:', engines);
+```
+
+## Generation (v1)
+
+### Text to Image
+
+```typescript
+const results = await stability.v1.generation.textToImage(
+  'stable-diffusion-xl-beta-v2-2-2', 
+  [
+    { text: 'a man on a horse', weight: 0.5 }
+  ]
+)
+
+for (const result of results) {
+  console.log('Text to image result filepath:', result.filepath);
+}
+```
+
+### Image to Image
+
+```typescript
+const results = await stability.v1.generation.imageToImage(
+  'stable-diffusion-xl-beta-v2-2-2', 
+  [
+    { text: 'crazy techincolor surprise', weight: 0.5 }
+  ],
+  'https://www.example.com/images/your-image.jpg'
+)
+
+for (const result of results) {
+  console.log('Image to image result filepath:', result.filepath);
+}
+```
+
+### Image to Image - Upscale
+
+```typescript
+const results = await stability.v1.generation.imageToImageUpscale(
+  'https://www.example.com/images/your-image.jpg',
+  {
+    type: 'esrgan'
+  }
+)
+
+for (const result of results) {
+  console.log('Image to image upscale result filepath:', result.filepath);
+}
+```
+
+### Image to Image - Masking
+
+```typescript
+const results = await stability.v1.generation.imageToImageMasking(
+  'stable-diffusion-xl-beta-v2-2-2', 
+  [
+    { text: 'a beautiful ocean', weight: 0.5 }
+  ],
+  'https://www.example.com/images/your-image-with-alpha-channel.png',
+  {
+    mask_source: 'INIT_IMAGE_ALPHA'
+  }
+)
+
+for (const result of results) {
+  console.log('Image to image masking result filepath:', result.filepath);
+}
+```
+
+## Generation (v2alpha)
+
+### Image to Video
+
+``` typescript
+const result = await stability.v2Alpha.generation.imageToVideo(
+  'https://www.example.com/images/photo-you-want-to-move.png'
+)
+
+let filepath: string | undefined = undefined
+
+while (!filepath) {
+  const videoResult = await stability.v2Alpha.generation.imageToVideoResult(result.id)
+
+  if ("filepath" in videoResult) {
+    filepath = videoResult.filepath
+  } else if ('status' in videoResult && videoResult.status === 'in-progress') {
+    await new Promise(resolve => setTimeout(resolve, 2500))
+  }
+}
+
+console.log('Image to video result filepath:', filepath)
+```
+
+### 4k Upscale
+
+``` typescript
+const result = await stability.v2Alpha.generation.upscale(
+  'https://www.example.com/images/photo-you-to-4k-upscale.png',
+  'UHD 4k'
+)
+
+let filepath: string | undefined = undefined
+
+while (!filepath) {
+  const upscaleResult = await stability.v2Alpha.generation.upscaleResult(result.id, result.output_format)
+
+  if ("filepath" in upscaleResult) {
+    filepath = upscaleResult.filepath
+  } else if ('status' in upscaleResult && upscaleResult.status === 'in-progress') {
+    await new Promise(resolve => setTimeout(resolve, 2500))
+  }
+}
+
+console.log('4k Upscale result filepath:', filepath)
+```
+
+### Inpaint
+
+```typescript
+const result = await stability.v2Alpha.generation.inpaint(
+  { mode: 'search', search_prompt: 'the earth' },
+  'https://www.example.com/images/your-image-of-the-earth.png',
+  'disco ball'
+);
+
+console.log('Inpaint result filepath:', result.filepath);
 ```
 
 ## Development and testing
@@ -31,4 +185,12 @@ Built in TypeScript, tested with Jest.
 ```bash
 $ yarn install
 $ yarn test
+```
+
+Road Map
+
+```
+- Support local files
+- Support output to S3/GCS bucket
+- Wrap job/result methods into one async task w/ internal polling
 ```

@@ -13,13 +13,13 @@ export enum APIVersion {
 
 // TYPE DEFINTIONS
 
-export interface APIContext { apiKey: string }
-
 export type OutputFormat = 'jpeg' | 'png' | 'webp';
 
 export type StabilityAIContentResult = { 
   filepath: string, 
-  content_filtered: boolean 
+  content_filtered: boolean,
+  errored: boolean
+  seed: number
 };
 
 // HELPER FUNCTIONS
@@ -62,10 +62,11 @@ export async function downloadImage(url: string) {
 // ERROR HANDLING
 
 export type StabilityAIErrorName = 
-  | 'SAIInvalidRequestError'
-  | 'SAIContentModerationError'
-  | 'SAIRecordNotFoundError'
-  | 'SAIUnknownError' 
+  | 'StabilityAIInvalidRequestError'
+  | 'StabilityAIUnauthorizedError'
+  | 'StabilityAIContentModerationError'
+  | 'StabilityAIRecordNotFoundError'
+  | 'StabilityAIUnknownError' 
 
 export class StabilityAIError extends Error {
   constructor(status: number, message: string, data?: any) {
@@ -81,17 +82,20 @@ export class StabilityAIError extends Error {
 
     super(fullMessage);
 
-    let name: StabilityAIErrorName = 'SAIUnknownError'
+    let name: StabilityAIErrorName = 'StabilityAIUnknownError'
 
     switch (status) {
       case 400:
-        name = 'SAIInvalidRequestError'
+        name = 'StabilityAIInvalidRequestError'
+        break;
+      case 401:
+        name = 'StabilityAIUnauthorizedError'
         break;
       case 403:
-        name = 'SAIContentModerationError'
+        name = 'StabilityAIContentModerationError'
         break;
       case 404:
-        name = 'SAIRecordNotFoundError'
+        name = 'StabilityAIRecordNotFoundError'
         break;
     }
 
