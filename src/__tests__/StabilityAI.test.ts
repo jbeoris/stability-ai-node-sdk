@@ -132,7 +132,8 @@ test('Image to Image Masking - (v1/generation/image-to-image/masking)', async ()
 test('Stable Image Generate Core - (v2beta/stale-image/generate/core)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result = await stability.v2beta.stableImage.generate.core('a beautiful ocean');
+  const result =
+    await stability.v2beta.stableImage.generate.core('a beautiful ocean');
 
   console.log('Stable Image Generate Core result filepath:', result.filepath);
 
@@ -143,7 +144,7 @@ test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableVideo.imageToVideo(
-    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg'
+    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg',
   );
 
   let filepath: string | undefined = undefined;
@@ -179,10 +180,11 @@ test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', a
   let filepath: string | undefined = undefined;
 
   while (!filepath) {
-    const upscaleResult = await stability.v2beta.stableImage.upscale.creativeResult(
-      result.id,
-      result.outputFormat,
-    );
+    const upscaleResult =
+      await stability.v2beta.stableImage.upscale.creativeResult(
+        result.id,
+        result.outputFormat,
+      );
 
     if ('filepath' in upscaleResult) {
       filepath = upscaleResult.filepath;
@@ -219,8 +221,8 @@ test('Stable Image Edit Outpaint - (v2beta/stable-image/edit/outpaint)', async (
     'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
     {
       prompt: 'outer space',
-      left: 100
-    }
+      left: 100,
+    },
   );
 
   console.log('Stable Image Edit Outpaint result filepath:', result.filepath);
@@ -234,10 +236,13 @@ test('Stable Image Edit Search and Replace - (v2beta/stable-image/edit/search-an
   const result = await stability.v2beta.stableImage.edit.searchAndReplace(
     'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
     'a disco ball',
-    'the earth'
+    'the earth',
   );
 
-  console.log('Stable Image Edit Search And Replace result filepath:', result.filepath);
+  console.log(
+    'Stable Image Edit Search And Replace result filepath:',
+    result.filepath,
+  );
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);
@@ -246,10 +251,13 @@ test('Stable Image Edit Remove Background - (v2beta/stable-image/edit/remove-bac
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.removeBackground(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg'
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
   );
 
-  console.log('Stable Image Edit Remove Background result filepath:', result.filepath);
+  console.log(
+    'Stable Image Edit Remove Background result filepath:',
+    result.filepath,
+  );
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);

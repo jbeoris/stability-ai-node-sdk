@@ -27,9 +27,9 @@ export type StabilityAIContentResponse = {
 };
 
 export type StabilityAIStatusResult = {
-  id: string,
-  status: 'in-progress'
-}
+  id: string;
+  status: 'in-progress';
+};
 
 // HELPER FUNCTIONS
 
@@ -77,7 +77,8 @@ export async function processContentResponse(
   let fileData = outputFormat === 'mp4' ? data.video : data.image;
   if (!fileData) fileData = data.base64;
   if (!fileData) throw new Error('No file data found in response');
-  const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' = data.finish_reason;
+  const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' =
+    data.finish_reason;
 
   const filename = `${resource}_${uuidv4()}.${outputFormat}`;
   const filepath = path.join(os.tmpdir(), filename);

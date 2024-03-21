@@ -19,16 +19,25 @@ enum Endpoints {
   CORE = 'core',
 }
 
-export type AspectRatio = '16:9' | '1:1' | '21:9' | '2:3' | '3:2' |' 4:5' | '5:4' | '9:16' |' 9:21';
+export type AspectRatio =
+  | '16:9'
+  | '1:1'
+  | '21:9'
+  | '2:3'
+  | '3:2'
+  | ' 4:5'
+  | '5:4'
+  | '9:16'
+  | ' 9:21';
 
 export type CoreRequest = [
   prompt: string,
   options?: {
-    aspectRatio?: AspectRatio,
-    negativePrompt?: string,
-    seed?: number,
-    outputFormat?: OutputFormat
-  }
+    aspectRatio?: AspectRatio;
+    negativePrompt?: string;
+    seed?: number;
+    outputFormat?: OutputFormat;
+  },
 ];
 
 /**
@@ -43,11 +52,12 @@ export async function core(
   const [prompt, options] = args;
 
   const formData: any = {
-    prompt
+    prompt,
   };
 
   if (options?.aspectRatio) formData.aspect_ratio = options.aspectRatio;
-  if (options?.negativePrompt) formData.negative_prompt = options.negativePrompt;
+  if (options?.negativePrompt)
+    formData.negative_prompt = options.negativePrompt;
   if (options?.seed) formData.seed = options.seed;
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
@@ -65,9 +75,9 @@ export async function core(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT, 
-      'v2beta_stable_image_generate_core'
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_generate_core',
     );
   }
 

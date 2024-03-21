@@ -73,24 +73,51 @@ class StabilityAI {
   public get v2beta() {
     return {
       stableVideo: {
-        imageToVideo: (...args: V2BetaStableVideoImageToVideo.ImageToVideoRequest): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResponse> => V2BetaStableVideoImageToVideo.imageToVideo.bind(this)(...args),
-        imageToVideoResult: (...args: V2BetaStableVideoImageToVideo.ImageToVideoResultRequest): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResultResponse> => V2BetaStableVideoImageToVideo.imageToVideoResult.bind(this)(...args),
+        imageToVideo: (
+          ...args: V2BetaStableVideoImageToVideo.ImageToVideoRequest
+        ): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResponse> =>
+          V2BetaStableVideoImageToVideo.imageToVideo.bind(this)(...args),
+        imageToVideoResult: (
+          ...args: V2BetaStableVideoImageToVideo.ImageToVideoResultRequest
+        ): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResultResponse> =>
+          V2BetaStableVideoImageToVideo.imageToVideoResult.bind(this)(...args),
       },
       stableImage: {
         edit: {
-          inpaint: (...args: V2BetaStableImageEdit.InpaintRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.inpaint.bind(this)(...args),
-          outpaint: (...args: V2BetaStableImageEdit.OutpaintRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.outpaint.bind(this)(...args),
-          searchAndReplace: (...args: V2BetaStableImageEdit.SearchAndReplaceRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.searchAndReplace.bind(this)(...args),
-          removeBackground: (...args: V2BetaStableImageEdit.RemoveBackgroundRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.removeBackground.bind(this)(...args)
+          inpaint: (
+            ...args: V2BetaStableImageEdit.InpaintRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageEdit.inpaint.bind(this)(...args),
+          outpaint: (
+            ...args: V2BetaStableImageEdit.OutpaintRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageEdit.outpaint.bind(this)(...args),
+          searchAndReplace: (
+            ...args: V2BetaStableImageEdit.SearchAndReplaceRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageEdit.searchAndReplace.bind(this)(...args),
+          removeBackground: (
+            ...args: V2BetaStableImageEdit.RemoveBackgroundRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageEdit.removeBackground.bind(this)(...args),
         },
         generate: {
-          core: (...args: V2BetaStableImageGenerate.CoreRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageGenerate.core.bind(this)(...args)
+          core: (
+            ...args: V2BetaStableImageGenerate.CoreRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageGenerate.core.bind(this)(...args),
         },
         upscale: {
-          creative: (...args: V2BetaStableImageUpscale.CreativeUpscaleRequest): Promise<V2BetaStableImageUpscale.CreativeUpscaleResponse> => V2BetaStableImageUpscale.creativeUpscale.bind(this)(...args),
-          creativeResult: (...args: V2BetaStableImageUpscale.CreativeUpscaleResultRequest): Promise<V2BetaStableImageUpscale.CreativeUpscaleResultResponse> => V2BetaStableImageUpscale.creativeUpscaleResult.bind(this)(...args)
-        }
-      }
+          creative: (
+            ...args: V2BetaStableImageUpscale.CreativeUpscaleRequest
+          ): Promise<V2BetaStableImageUpscale.CreativeUpscaleResponse> =>
+            V2BetaStableImageUpscale.creativeUpscale.bind(this)(...args),
+          creativeResult: (
+            ...args: V2BetaStableImageUpscale.CreativeUpscaleResultRequest
+          ): Promise<V2BetaStableImageUpscale.CreativeUpscaleResultResponse> =>
+            V2BetaStableImageUpscale.creativeUpscaleResult.bind(this)(...args),
+        },
+      },
     };
   }
 }

@@ -5,7 +5,7 @@ import {
   APIVersion,
   StabilityAIError,
   StabilityAIContentResponse,
-  StabilityAIStatusResult
+  StabilityAIStatusResult,
 } from '../../util';
 import * as Util from '../../util';
 import StabilityAI from '../..';
@@ -115,7 +115,11 @@ export async function imageToVideoResult(
   );
 
   if (response.status === 200) {
-    return Util.processContentResponse(response.data, 'mp4', 'v2beta_image_to_video');
+    return Util.processContentResponse(
+      response.data,
+      'mp4',
+      'v2beta_image_to_video',
+    );
   } else if (
     response.status === 202 &&
     typeof response.data.id === 'string' &&

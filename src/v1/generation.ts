@@ -98,7 +98,7 @@ async function processArtifacts(
       artifact,
       'png',
       'v1_generation_text_to_image',
-    )
+    );
 
     results.push(contentResponse);
   }

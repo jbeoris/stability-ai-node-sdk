@@ -6,7 +6,7 @@ import {
   APIVersion,
   StabilityAIError,
   StabilityAIContentResponse,
-  StabilityAIStatusResult
+  StabilityAIStatusResult,
 } from '../../util';
 import * as Util from '../../util';
 import StabilityAI from '../..';
@@ -15,7 +15,7 @@ const RESOURCE = 'stable-image/upscale';
 
 enum Endpoints {
   CREATIVE = 'creative',
-  CREATIVE_RESULT = 'creative/result'
+  CREATIVE_RESULT = 'creative/result',
 }
 
 export type CreativeUpscaleRequest = [
@@ -29,7 +29,10 @@ export type CreativeUpscaleRequest = [
   },
 ];
 
-export type CreativeUpscaleResponse = { id: string; outputFormat: OutputFormat };
+export type CreativeUpscaleResponse = {
+  id: string;
+  outputFormat: OutputFormat;
+};
 
 /**
  * Stability AI Stable Image Creative Upscale (v2beta)
@@ -88,7 +91,10 @@ export async function creativeUpscale(
   );
 }
 
-export type CreativeUpscaleResultRequest = [id: string, outputFormat: OutputFormat];
+export type CreativeUpscaleResultRequest = [
+  id: string,
+  outputFormat: OutputFormat,
+];
 
 export type CreativeUpscaleResultResponse =
   | StabilityAIContentResponse
@@ -107,11 +113,8 @@ export async function creativeUpscaleResult(
 ): Promise<CreativeUpscaleResultResponse> {
   const [id, outputFormat] = args;
   const response = await axios.get(
-    Util.makeUrl(
-      APIVersion.V2_BETA,
-      RESOURCE,
-      Endpoints.CREATIVE_RESULT,
-    ) + `/${id}`,
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.CREATIVE_RESULT) +
+      `/${id}`,
     {
       validateStatus: undefined,
       headers: {
@@ -123,9 +126,9 @@ export async function creativeUpscaleResult(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      outputFormat, 
-      'v2beta_stable_image_upscale_creative'
+      response.data,
+      outputFormat,
+      'v2beta_stable_image_upscale_creative',
     );
   } else if (
     response.status === 202 &&

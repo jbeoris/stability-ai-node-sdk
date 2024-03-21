@@ -16,7 +16,7 @@ enum Endpoints {
   INPAINT = 'inpaint',
   OUTPAINT = 'outpaint',
   SEARCH_AND_REPLACE = 'search-and-replace',
-  REMOVE_BACKGROUND = 'remove-background'
+  REMOVE_BACKGROUND = 'remove-background',
 }
 
 export type InpaintRequest = [
@@ -43,7 +43,9 @@ export async function inpaint(
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, options] = args;
   const imageFilepath = await Util.downloadImage(image);
-  const maskFilepath = options?.mask ? await Util.downloadImage(options.mask) : undefined;
+  const maskFilepath = options?.mask
+    ? await Util.downloadImage(options.mask)
+    : undefined;
 
   const formData: {
     image: fs.ReadStream;
@@ -80,9 +82,9 @@ export async function inpaint(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT, 
-      'v2beta_stable_image_edit_inpaint'
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_edit_inpaint',
     );
   }
 
@@ -100,27 +102,30 @@ export type OutpaintRequest = [
     seed?: number;
     outputFormat?: OutputFormat;
   } & (
-    {
-      left: number,
-      right?: number,
-      up?: number,
-      down?: number,
-    } | {
-      left?: number,
-      right: number,
-      up?: number,
-      down?: number
-    } | {
-      left?: number,
-      right?: number,
-      up: number,
-      down?: number
-    } | {
-      left?: number,
-      right?: number,
-      up?: number,
-      down: number
-    }
+    | {
+        left: number;
+        right?: number;
+        up?: number;
+        down?: number;
+      }
+    | {
+        left?: number;
+        right: number;
+        up?: number;
+        down?: number;
+      }
+    | {
+        left?: number;
+        right?: number;
+        up: number;
+        down?: number;
+      }
+    | {
+        left?: number;
+        right?: number;
+        up?: number;
+        down: number;
+      }
   ),
 ];
 
@@ -148,7 +153,7 @@ export async function outpaint(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath)
+    image: fs.createReadStream(imageFilepath),
   };
 
   if (options?.left) formData.left = options.left;
@@ -175,9 +180,9 @@ export async function outpaint(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT, 
-      'v2beta_stable_image_edit_outpaint'
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_edit_outpaint',
     );
   }
 
@@ -216,8 +221,8 @@ export async function searchAndReplace(
 
   const formData: {
     image: fs.ReadStream;
-    prompt: string,
-    search_prompt: string,
+    prompt: string;
+    search_prompt: string;
     negative_prompt?: string;
     seed?: number;
     output_format?: OutputFormat;
@@ -227,7 +232,8 @@ export async function searchAndReplace(
     search_prompt: searchPrompt,
   };
 
-  if (options?.negativePrompt) formData.negative_prompt = options.negativePrompt;
+  if (options?.negativePrompt)
+    formData.negative_prompt = options.negativePrompt;
   if (options?.seed) formData.seed = options.seed;
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
@@ -247,9 +253,9 @@ export async function searchAndReplace(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT, 
-      'v2beta_stable_image_edit_search_and_replace'
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_edit_search_and_replace',
     );
   }
 
@@ -305,9 +311,9 @@ export async function removeBackground(
 
   if (response.status === 200) {
     return Util.processContentResponse(
-      response.data, 
-      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT, 
-      'v2beta_stable_image_edit_remove_background'
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_edit_remove_background',
     );
   }
 
