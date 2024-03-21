@@ -127,19 +127,29 @@ test('Image to Image Masking - (v1/generation/image-to-image/masking)', async ()
   expect(Array.isArray(results)).toBe(true);
 }, 30000);
 
-// v2alpha/generation
+// v2beta
 
-test('Image to Video - (v2alpha/generation/image-to-video)', async () => {
+test('Stable Image Generate Core - (v2beta/stale-image/generate/core)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result = await stability.v2Alpha.generation.imageToVideo(
-    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg',
+  const result = await stability.v2beta.stableImage.generate.core('a beautiful ocean');
+
+  console.log('Stable Image Generate Core result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 600000);
+
+test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableVideo.imageToVideo(
+    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg'
   );
 
   let filepath: string | undefined = undefined;
 
   while (!filepath) {
-    const videoResult = await stability.v2Alpha.generation.imageToVideoResult(
+    const videoResult = await stability.v2beta.stableVideo.imageToVideoResult(
       result.id,
     );
 
@@ -153,15 +163,15 @@ test('Image to Video - (v2alpha/generation/image-to-video)', async () => {
     }
   }
 
-  console.log('Image to video result filepath:', filepath);
+  console.log('Stable Video Image to Video result filepath:', filepath);
 
   expect(typeof filepath).toBe('string');
 }, 600000);
 
-test('4k Upscale - (v2alpha/generation/upscale)', async () => {
+test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result = await stability.v2Alpha.generation.upscale(
+  const result = await stability.v2beta.stableImage.upscale.creative(
     'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
     'UHD 4k',
   );
@@ -169,9 +179,9 @@ test('4k Upscale - (v2alpha/generation/upscale)', async () => {
   let filepath: string | undefined = undefined;
 
   while (!filepath) {
-    const upscaleResult = await stability.v2Alpha.generation.upscaleResult(
+    const upscaleResult = await stability.v2beta.stableImage.upscale.creativeResult(
       result.id,
-      result.output_format,
+      result.outputFormat,
     );
 
     if ('filepath' in upscaleResult) {
@@ -184,24 +194,62 @@ test('4k Upscale - (v2alpha/generation/upscale)', async () => {
     }
   }
 
-  console.log('Upscale result filepath:', filepath);
+  console.log('Stable Image Upscale Creative result filepath:', filepath);
 
   expect(typeof filepath).toBe('string');
 }, 600000);
 
-test('Inpaint - (v2alpha/generation/inpaint)', async () => {
+test('Stable Image Edit Inpaint - (v2beta/stable-image/edit/inpaint)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result = await stability.v2Alpha.generation.inpaint(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+  const result = await stability.v2beta.stableImage.edit.inpaint(
+    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
     'disco ball',
-    {
-      mode: 'search',
-      search_prompt: 'the earth',
-    },
   );
 
-  console.log('Inpaint result filepath:', result.filepath);
+  console.log('Stable Image Edit Inpaint result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
+
+test('Stable Image Edit Outpaint - (v2beta/stable-image/edit/outpaint)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.edit.outpaint(
+    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
+    {
+      prompt: 'outer space',
+      left: 100
+    }
+  );
+
+  console.log('Stable Image Edit Outpaint result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
+
+test('Stable Image Edit Search and Replace - (v2beta/stable-image/edit/search-and-replace)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.edit.searchAndReplace(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    'a disco ball',
+    'the earth'
+  );
+
+  console.log('Stable Image Edit Search And Replace result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
+
+test('Stable Image Edit Remove Background - (v2beta/stable-image/edit/remove-background)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.edit.removeBackground(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg'
+  );
+
+  console.log('Stable Image Edit Remove Background result filepath:', result.filepath);
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);

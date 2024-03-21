@@ -2,7 +2,11 @@ import _ from 'lodash';
 import * as V1User from './v1/user';
 import * as V1Engines from './v1/engines';
 import * as V1Generation from './v1/generation';
-import * as V2AlphaGeneration from './v2alpha/generation';
+import * as V2BetaStableVideoImageToVideo from './v2beta/stable-video/image-to-video';
+import * as V2BetaStableImageEdit from './v2beta/stable-image/edit';
+import * as V2BetaStableImageGenerate from './v2beta/stable-image/generate';
+import * as V2BetaStableImageUpscale from './v2beta/stable-image/upscale';
+import { StabilityAIContentResponse, StabilityAIStatusResult } from './util';
 
 class StabilityAI {
   private apiKey: string;
@@ -48,48 +52,45 @@ class StabilityAI {
       generation: {
         textToImage: (
           ...args: V1Generation.TextToImageOptions
-        ): Promise<V1Generation.ContentResultResponse> =>
+        ): Promise<StabilityAIContentResponse[]> =>
           V1Generation.textToImage.bind(this)(...args),
         imageToImage: (
           ...args: V1Generation.ImageToImageOptions
-        ): Promise<V1Generation.ContentResultResponse> =>
+        ): Promise<StabilityAIContentResponse[]> =>
           V1Generation.imageToImage.bind(this)(...args),
         imageToImageUpscale: (
           ...args: V1Generation.ImageToImageUpscaleOptions
-        ): Promise<V1Generation.ContentResultResponse> =>
+        ): Promise<StabilityAIContentResponse[]> =>
           V1Generation.imageToImageUpscale.bind(this)(...args),
         imageToImageMasking: (
           ...args: V1Generation.ImageToImageMaskingOptions
-        ): Promise<V1Generation.ContentResultResponse> =>
+        ): Promise<StabilityAIContentResponse[]> =>
           V1Generation.imageToImageMasking.bind(this)(...args),
       },
     };
   }
 
-  public get v2Alpha() {
+  public get v2beta() {
     return {
-      generation: {
-        upscale: (
-          ...args: V2AlphaGeneration.UpscaleOptions
-        ): Promise<V2AlphaGeneration.UpscaleRepsonse> =>
-          V2AlphaGeneration.upscale.bind(this)(...args),
-        upscaleResult: (
-          ...args: V2AlphaGeneration.UpscaleResultOptions
-        ): Promise<V2AlphaGeneration.UpscaleResultResponse> =>
-          V2AlphaGeneration.upscaleResult.bind(this)(...args),
-        inpaint: (
-          ...args: V2AlphaGeneration.InpaintOptions
-        ): Promise<V2AlphaGeneration.InpaintResponse> =>
-          V2AlphaGeneration.inpaint.bind(this)(...args),
-        imageToVideo: (
-          ...args: V2AlphaGeneration.ImageToVideoOptions
-        ): Promise<V2AlphaGeneration.ImageToVideoResponse> =>
-          V2AlphaGeneration.imageToVideo.bind(this)(...args),
-        imageToVideoResult: (
-          ...args: V2AlphaGeneration.ImageToVideoResultOptions
-        ): Promise<V2AlphaGeneration.ImageToVideoResultResponse> =>
-          V2AlphaGeneration.imageToVideoResult.bind(this)(...args),
+      stableVideo: {
+        imageToVideo: (...args: V2BetaStableVideoImageToVideo.ImageToVideoRequest): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResponse> => V2BetaStableVideoImageToVideo.imageToVideo.bind(this)(...args),
+        imageToVideoResult: (...args: V2BetaStableVideoImageToVideo.ImageToVideoResultRequest): Promise<V2BetaStableVideoImageToVideo.ImageToVideoResultResponse> => V2BetaStableVideoImageToVideo.imageToVideoResult.bind(this)(...args),
       },
+      stableImage: {
+        edit: {
+          inpaint: (...args: V2BetaStableImageEdit.InpaintRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.inpaint.bind(this)(...args),
+          outpaint: (...args: V2BetaStableImageEdit.OutpaintRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.outpaint.bind(this)(...args),
+          searchAndReplace: (...args: V2BetaStableImageEdit.SearchAndReplaceRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.searchAndReplace.bind(this)(...args),
+          removeBackground: (...args: V2BetaStableImageEdit.RemoveBackgroundRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageEdit.removeBackground.bind(this)(...args)
+        },
+        generate: {
+          core: (...args: V2BetaStableImageGenerate.CoreRequest): Promise<StabilityAIContentResponse> => V2BetaStableImageGenerate.core.bind(this)(...args)
+        },
+        upscale: {
+          creative: (...args: V2BetaStableImageUpscale.CreativeUpscaleRequest): Promise<V2BetaStableImageUpscale.CreativeUpscaleResponse> => V2BetaStableImageUpscale.creativeUpscale.bind(this)(...args),
+          creativeResult: (...args: V2BetaStableImageUpscale.CreativeUpscaleResultRequest): Promise<V2BetaStableImageUpscale.CreativeUpscaleResultResponse> => V2BetaStableImageUpscale.creativeUpscaleResult.bind(this)(...args)
+        }
+      }
     };
   }
 }

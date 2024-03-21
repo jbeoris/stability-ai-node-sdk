@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import path from 'path';
 import os from 'os';
 import fs from 'fs-extra';
@@ -8,22 +8,28 @@ const STABILITY_AI_BASE_URL = 'https://api.stability.ai';
 
 export enum APIVersion {
   V1 = 'v1',
-  V2_ALPHA = 'v2alpha',
+  V2_BETA = 'v2beta',
 }
 
 // TYPE DEFINTIONS
 
 export type OutputFormat = 'jpeg' | 'png' | 'webp';
+export const DEFAULT_OUTPUT_FORMAT: OutputFormat = 'png';
 
-export type StabilityAIContentResult = {
+export type StabilityAIContentResponse = {
   filepath: string;
   filename: string;
-  content_type: 'image' | 'video';
-  output_format: OutputFormat | 'mp4';
-  content_filtered: boolean;
+  contentType: 'image' | 'video';
+  outputFormat: OutputFormat | 'mp4';
+  contentFiltered: boolean;
   errored: boolean;
   seed: number;
 };
+
+export type StabilityAIStatusResult = {
+  id: string,
+  status: 'in-progress'
+}
 
 // HELPER FUNCTIONS
 
@@ -32,7 +38,7 @@ export function makeUrl(
   resource: string,
   endpoint: string,
 ) {
-  return `${STABILITY_AI_BASE_URL}/${verison}/${resource}/${endpoint}`;
+  return `${STABILITY_AI_BASE_URL}/${verison}/${resource}${endpoint.length > 0 ? `/${endpoint}` : ''}`;
 }
 
 /**
@@ -61,6 +67,32 @@ export async function downloadImage(url: string) {
     }
   });
   return filepath;
+}
+
+export async function processContentResponse(
+  data: any,
+  outputFormat: OutputFormat | 'mp4',
+  resource: string,
+): Promise<StabilityAIContentResponse> {
+  let fileData = outputFormat === 'mp4' ? data.video : data.image;
+  if (!fileData) fileData = data.base64;
+  if (!fileData) throw new Error('No file data found in response');
+  const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' = data.finish_reason;
+
+  const filename = `${resource}_${uuidv4()}.${outputFormat}`;
+  const filepath = path.join(os.tmpdir(), filename);
+
+  await fs.writeFile(filepath, fileData, 'base64');
+
+  return {
+    filepath,
+    filename,
+    contentType: outputFormat === 'mp4' ? 'video' : 'image',
+    outputFormat,
+    contentFiltered: finishReason === 'CONTENT_FILTERED',
+    errored: finishReason === 'ERROR',
+    seed: data.seed,
+  };
 }
 
 // ERROR HANDLING

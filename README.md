@@ -21,6 +21,32 @@ import StabilityAI from 'stability-ai';
 const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 ```
 
+## Table of Contents
+
+### User (v1)
+- [Account](#account)
+- [Balance](#balance)
+
+### Engines (v1)
+- [List](#list)
+
+### Generation (v1)
+- [Text to Image](#text-to-image)
+- [Image to Image](#image-to-image)
+- [Image to Image - Upscale](#image-to-image---upscale)
+- [Image to Image - Masking](#image-to-image---masking)
+
+### Stable Video (v2beta)
+- [Image to Video](#image-to-video)
+
+### Stable Image (v2beta)
+- [Generate - Core](#generate---core)
+- [Upscale - Creative](#upscale---creative)
+- [Edit - Inpaint](#edit---inpaint)
+- [Edit - Outpaint](#edit---outpaint)
+- [Edit - Search and Replace](#edit---search-and-replace)
+- [Edit - Remove Background](#edit---remove-background)
+
 ## User (v1)
 
 ### Account
@@ -119,66 +145,119 @@ for (const result of results) {
 }
 ```
 
-## Generation (v2alpha)
+## Stable Video (v2beta)
 
 ### Image to Video
 
 ``` typescript
-const result = await stability.v2Alpha.generation.imageToVideo(
+const result = await stability.v2beta.stableVideo.imageToVideo(
   'https://www.example.com/images/photo-you-want-to-move.png'
-)
+);
 
-let filepath: string | undefined = undefined
+let filepath: string | undefined = undefined;
 
 while (!filepath) {
-  const videoResult = await stability.v2Alpha.generation.imageToVideoResult(result.id)
+  const videoResult = await stability.v2beta.stableVideo.imageToVideoResult(
+    result.id,
+  );
 
-  if ("filepath" in videoResult) {
-    filepath = videoResult.filepath
-  } else if ('status' in videoResult && videoResult.status === 'in-progress') {
-    await new Promise(resolve => setTimeout(resolve, 2500))
+  if ('filepath' in videoResult) {
+    filepath = videoResult.filepath;
+  } else if (
+    'status' in videoResult &&
+    videoResult.status === 'in-progress'
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 2500));
   }
 }
 
-console.log('Image to video result filepath:', filepath)
+console.log('Stable Video Image to Video result filepath:', filepath);
 ```
 
-### 4k Upscale
+## Stable Image (v2beta)
 
-``` typescript
-const result = await stability.v2Alpha.generation.upscale(
-  'https://www.example.com/images/photo-you-to-4k-upscale.png',
-  'UHD 4k'
-)
-
-let filepath: string | undefined = undefined
-
-while (!filepath) {
-  const upscaleResult = await stability.v2Alpha.generation.upscaleResult(result.id, result.output_format)
-
-  if ("filepath" in upscaleResult) {
-    filepath = upscaleResult.filepath
-  } else if ('status' in upscaleResult && upscaleResult.status === 'in-progress') {
-    await new Promise(resolve => setTimeout(resolve, 2500))
-  }
-}
-
-console.log('4k Upscale result filepath:', filepath)
-```
-
-### Inpaint
+### Generate - Core
 
 ```typescript
-const result = await stability.v2Alpha.generation.inpaint(
+const result = await stability.v2beta.stableImage.generate.core('a beautiful ocean');
+
+console.log('Stable Image Generate Core result filepath:', result.filepath);
+```
+
+### Upscale - Creative
+
+``` typescript
+const result = await stability.v2beta.stableImage.upscale.creative(
+  'https://www.example.com/images/photo-you-to-4k-upscale.png',
+  'UHD 4k',
+);
+
+let filepath: string | undefined = undefined;
+
+while (!filepath) {
+  const upscaleResult = await stability.v2beta.stableImage.upscale.creativeResult(
+    result.id,
+    result.outputFormat,
+  );
+
+  if ('filepath' in upscaleResult) {
+    filepath = upscaleResult.filepath;
+  } else if (
+    'status' in upscaleResult &&
+    upscaleResult.status === 'in-progress'
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+  }
+}
+
+console.log('Stable Image Upscale Creative result filepath:', filepath);
+```
+
+### Edit - Inpaint
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.inpaint(
   'https://www.example.com/images/your-image-of-the-earth.png',
   'disco ball',
+);
+
+console.log('Stable Image Edit Inpaint result filepath:', result.filepath);
+```
+
+### Edit - Outpaint
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.outpaint(
+  'https://www.example.com/images/your-image-of-the-earth.png',
   {
-    mode: 'search',
-    search_prompt: 'the earth'
+    prompt: 'outer space',
+    left: 100
   }
 );
 
-console.log('Inpaint result filepath:', result.filepath);
+console.log('Stable Image Edit Outpaint result filepath:', result.filepath);
+```
+
+### Edit - Search and Replace
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.searchAndReplace(
+  'https://www.example.com/images/your-image-of-the-earth.png',
+  'a disco ball',
+  'the earth'
+);
+
+console.log('Stable Image Edit Search And Replace result filepath:', result.filepath);
+```
+
+### Edit - Remove Background
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.removeBackground(
+  'https://www.example.com/images/your-image-of-the-earth.png',
+);
+
+console.log('Stable Image Edit Remove Background result filepath:', result.filepath);
 ```
 
 ## Development and testing

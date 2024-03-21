@@ -1,13 +1,10 @@
 import axios from 'axios';
 import fs from 'fs-extra';
-import os from 'os';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import FormData from 'form-data';
 import {
   APIVersion,
   StabilityAIError,
-  StabilityAIContentResult,
+  StabilityAIContentResponse,
 } from '../util';
 import * as Util from '../util';
 import StabilityAI from '..';
@@ -91,31 +88,19 @@ export type TextToImageOptions = [
   } & V1GenerationOptionalParams,
 ];
 
-export type ContentResultResponse = StabilityAIContentResult[];
-
 async function processArtifacts(
   artifacts: any[],
-): Promise<StabilityAIContentResult[]> {
-  const results: StabilityAIContentResult[] = [];
+): Promise<StabilityAIContentResponse[]> {
+  const results: StabilityAIContentResponse[] = [];
 
   for (const artifact of artifacts) {
-    const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' =
-      artifact.finish_reason;
+    const contentResponse = await Util.processContentResponse(
+      artifact,
+      'png',
+      'v1_generation_text_to_image',
+    )
 
-    const filename = `${uuidv4()}.png`;
-    const filepath = path.join(os.tmpdir(), filename);
-
-    await fs.writeFile(filepath, artifact.base64, 'base64');
-
-    results.push({
-      filepath,
-      filename,
-      content_type: 'image',
-      output_format: 'png',
-      content_filtered: finishReason === 'CONTENT_FILTERED',
-      errored: finishReason === 'ERROR',
-      seed: artifact.seed,
-    });
+    results.push(contentResponse);
   }
 
   return results;
@@ -130,7 +115,7 @@ async function processArtifacts(
 export async function textToImage(
   this: StabilityAI,
   ...args: TextToImageOptions
-): Promise<ContentResultResponse> {
+): Promise<StabilityAIContentResponse[]> {
   const [engineId, textPrompts, options] = args;
 
   const body: any = {
@@ -190,7 +175,7 @@ export type ImageToImageOptions = [
 export async function imageToImage(
   this: StabilityAI,
   ...args: ImageToImageOptions
-): Promise<ContentResultResponse> {
+): Promise<StabilityAIContentResponse[]> {
   const [engineId, textPrompts, initImage, options] = args;
   const imageFilepath = await Util.downloadImage(initImage);
 
@@ -253,7 +238,7 @@ export type ImageToImageUpscaleOptions = [
 export async function imageToImageUpscale(
   this: StabilityAI,
   ...args: ImageToImageUpscaleOptions
-): Promise<ContentResultResponse> {
+): Promise<StabilityAIContentResponse[]> {
   const [image, options] = args;
   const imageFilepath = await Util.downloadImage(image);
 
@@ -318,7 +303,7 @@ export type ImageToImageMaskingOptions = [
 export async function imageToImageMasking(
   this: StabilityAI,
   ...args: ImageToImageMaskingOptions
-): Promise<ContentResultResponse> {
+): Promise<StabilityAIContentResponse[]> {
   const [engineId, textPrompts, initImage, options] = args;
   const imageFilepath = await Util.downloadImage(initImage);
   let maskFilepath: string | undefined = undefined;
