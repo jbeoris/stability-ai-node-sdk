@@ -19,8 +19,8 @@ enum Endpoints {
 
 export type ImageToVideoRequest = [
   image: string,
-  motionBucketId?: number,
   cfgScale?: number,
+  motionBucketId?: number,
   options?: {
     seed?: number;
   },
