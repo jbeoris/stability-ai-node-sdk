@@ -91,24 +91,27 @@ export type SD3Request = [
   options?: {
     model?: 'sd3' | 'sd3-turbo';
     seed?: number;
-    outputFormat?: "jpeg" | "png";
+    outputFormat?: 'jpeg' | 'png';
   } & (
-    {
-      mode: 'text-to-image',
-      aspectRatio?: AspectRatio;
-    } | {
-      mode: 'image-to-image',
-      image: string;
-      strength: number;
-    }
-  ) & (
-    {
-      model: 'sd3-turbo';
-    } | {
-      model?: 'sd3';
-      negativePrompt?: string;
-    }
-  )
+    | {
+        mode: 'text-to-image';
+        aspectRatio?: AspectRatio;
+      }
+    | {
+        mode: 'image-to-image';
+        image: string;
+        strength: number;
+      }
+  ) &
+    (
+      | {
+          model: 'sd3-turbo';
+        }
+      | {
+          model?: 'sd3';
+          negativePrompt?: string;
+        }
+    ),
 ];
 
 /**
