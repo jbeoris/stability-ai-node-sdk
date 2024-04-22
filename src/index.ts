@@ -6,7 +6,7 @@ import * as V2BetaStableVideoImageToVideo from './v2beta/stable-video/image-to-v
 import * as V2BetaStableImageEdit from './v2beta/stable-image/edit';
 import * as V2BetaStableImageGenerate from './v2beta/stable-image/generate';
 import * as V2BetaStableImageUpscale from './v2beta/stable-image/upscale';
-import { StabilityAIContentResponse, StabilityAIStatusResult } from './util';
+import { StabilityAIContentResponse } from './util';
 
 class StabilityAI {
   private apiKey: string;
@@ -106,6 +106,10 @@ class StabilityAI {
             ...args: V2BetaStableImageGenerate.CoreRequest
           ): Promise<StabilityAIContentResponse> =>
             V2BetaStableImageGenerate.core.bind(this)(...args),
+          sd3: (
+            ...args: V2BetaStableImageGenerate.SD3Request
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageGenerate.sd3.bind(this)(...args),
         },
         upscale: {
           creative: (

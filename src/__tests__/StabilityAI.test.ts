@@ -140,6 +140,17 @@ test('Stable Image Generate Core - (v2beta/stale-image/generate/core)', async ()
   expect(typeof result.filepath).toBe('string');
 }, 600000);
 
+test('Stable Image Generate SD3 - (v2beta/stale-image/generate/sd3)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result =
+    await stability.v2beta.stableImage.generate.sd3('a beautiful ocean');
+
+  console.log('Stable Image Generate SD3 result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 600000);
+
 test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 

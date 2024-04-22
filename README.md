@@ -41,6 +41,7 @@ const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 
 ### Stable Image (v2beta)
 - [Generate - Core](#generate---core)
+- [Generate - SD3](#generate---sd3)
 - [Upscale - Creative](#upscale---creative)
 - [Edit - Inpaint](#edit---inpaint)
 - [Edit - Outpaint](#edit---outpaint)
@@ -182,6 +183,14 @@ console.log('Stable Video Image to Video result filepath:', filepath);
 const result = await stability.v2beta.stableImage.generate.core('a beautiful ocean');
 
 console.log('Stable Image Generate Core result filepath:', result.filepath);
+```
+
+### Generate - SD3
+
+```typescript
+const result = await stability.v2beta.stableImage.generate.sd3('a very beautiful ocean');
+
+console.log('Stable Image Generate SD3 result filepath:', result.filepath);
 ```
 
 ### Upscale - Creative
