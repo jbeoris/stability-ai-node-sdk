@@ -129,6 +129,17 @@ test('Image to Image Masking - (v1/generation/image-to-image/masking)', async ()
 
 // v2beta
 
+test('Stable Image Generate Ultra - (v2beta/stale-image/generate/ultra)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result =
+    await stability.v2beta.stableImage.generate.ultra('a beautiful mountain');
+
+  console.log('Stable Image Generate Ultra result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 600000);
+
 test('Stable Image Generate Core - (v2beta/stale-image/generate/core)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
@@ -180,10 +191,23 @@ test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
   expect(typeof filepath).toBe('string');
 }, 600000);
 
+test('Stable Image Upscale Conservative - (v2beta/stable-image/upscale/conservative)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.upscale.conservative(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    'UHD 4k',
+  );
+
+  console.log('Stable Image Upscale Conservative result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 600000);
+
 test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result = await stability.v2beta.stableImage.upscale.creative(
+  const result = await stability.v2beta.stableImage.upscale.startCreative(
     'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
     'UHD 4k',
   );
@@ -192,7 +216,7 @@ test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', a
 
   while (!filepath) {
     const upscaleResult =
-      await stability.v2beta.stableImage.upscale.creativeResult(
+      await stability.v2beta.stableImage.upscale.fetchCreativeResult(
         result.id,
         result.outputFormat,
       );
@@ -211,6 +235,18 @@ test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', a
 
   expect(typeof filepath).toBe('string');
 }, 600000);
+
+test('Stable Image Edit Erase - (v2beta/stable-image/edit/erase)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.edit.erase(
+    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png'
+  );
+
+  console.log('Stable Image Edit Erase result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
 
 test('Stable Image Edit Inpaint - (v2beta/stable-image/edit/inpaint)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');

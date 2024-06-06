@@ -177,6 +177,14 @@ console.log('Stable Video Image to Video result filepath:', filepath);
 
 ## Stable Image (v2beta)
 
+### Generate - Ultra
+
+```typescript
+const result = await stability.v2beta.stableImage.generate.ultra('a beautiful mountain');
+
+console.log('Stable Image Generate Ultra result filepath:', result.filepath);
+```
+
 ### Generate - Core
 
 ```typescript
@@ -193,10 +201,21 @@ const result = await stability.v2beta.stableImage.generate.sd3('a very beautiful
 console.log('Stable Image Generate SD3 result filepath:', result.filepath);
 ```
 
+### Upscale - Conservative
+
+``` typescript
+const result = await stability.v2beta.stableImage.upscale.conservative(
+  'https://www.example.com/images/photo-you-to-4k-upscale.png',
+  'UHD 4k',
+);
+
+console.log('Stable Image Upscale Conservative result filepath:', result.filepath);
+```
+
 ### Upscale - Creative
 
 ``` typescript
-const result = await stability.v2beta.stableImage.upscale.creative(
+const result = await stability.v2beta.stableImage.upscale.startCreative(
   'https://www.example.com/images/photo-you-to-4k-upscale.png',
   'UHD 4k',
 );
@@ -204,7 +223,7 @@ const result = await stability.v2beta.stableImage.upscale.creative(
 let filepath: string | undefined = undefined;
 
 while (!filepath) {
-  const upscaleResult = await stability.v2beta.stableImage.upscale.creativeResult(
+  const upscaleResult = await stability.v2beta.stableImage.upscale.fetchCreativeResult(
     result.id,
     result.outputFormat,
   );
@@ -220,6 +239,16 @@ while (!filepath) {
 }
 
 console.log('Stable Image Upscale Creative result filepath:', filepath);
+```
+
+### Edit - Erase
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.erase(
+  'https://www.example.com/images/your-image-of-the-earth.png'
+);
+
+console.log('Stable Image Edit Erase result filepath:', result.filepath);
 ```
 
 ### Edit - Inpaint

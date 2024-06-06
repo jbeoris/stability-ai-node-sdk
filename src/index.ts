@@ -84,6 +84,10 @@ class StabilityAI {
       },
       stableImage: {
         edit: {
+          erase: (
+            ...args: V2BetaStableImageEdit.EraseRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageEdit.erase.bind(this)(...args),
           inpaint: (
             ...args: V2BetaStableImageEdit.InpaintRequest
           ): Promise<StabilityAIContentResponse> =>
@@ -102,6 +106,10 @@ class StabilityAI {
             V2BetaStableImageEdit.removeBackground.bind(this)(...args),
         },
         generate: {
+          ultra: (
+            ...args: V2BetaStableImageGenerate.UltraRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageGenerate.ultra.bind(this)(...args),
           core: (
             ...args: V2BetaStableImageGenerate.CoreRequest
           ): Promise<StabilityAIContentResponse> =>
@@ -112,14 +120,18 @@ class StabilityAI {
             V2BetaStableImageGenerate.sd3.bind(this)(...args),
         },
         upscale: {
-          creative: (
+          conservative: (
+            ...args: V2BetaStableImageUpscale.ConservativeUpscaleRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageUpscale.conservative.bind(this)(...args),
+          startCreative: (
             ...args: V2BetaStableImageUpscale.CreativeUpscaleRequest
           ): Promise<V2BetaStableImageUpscale.CreativeUpscaleResponse> =>
-            V2BetaStableImageUpscale.creativeUpscale.bind(this)(...args),
-          creativeResult: (
+            V2BetaStableImageUpscale.startCreative.bind(this)(...args),
+          fetchCreativeResult: (
             ...args: V2BetaStableImageUpscale.CreativeUpscaleResultRequest
           ): Promise<V2BetaStableImageUpscale.CreativeUpscaleResultResponse> =>
-            V2BetaStableImageUpscale.creativeUpscaleResult.bind(this)(...args),
+            V2BetaStableImageUpscale.fetchCreativeResult.bind(this)(...args),
         },
       },
     };

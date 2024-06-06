@@ -13,10 +13,79 @@ import StabilityAI from '../..';
 const RESOURCE = 'stable-image/edit';
 
 enum Endpoints {
+  ERASE = 'erase',
   INPAINT = 'inpaint',
   OUTPAINT = 'outpaint',
   SEARCH_AND_REPLACE = 'search-and-replace',
   REMOVE_BACKGROUND = 'remove-background',
+}
+
+export type EraseRequest = [
+  image: string,
+  options?: {
+    mask?: string;
+    seed?: number;
+    outputFormat?: OutputFormat;
+  },
+];
+
+/**
+ * Stability AI Stable Image Erase (v2beta)
+ *
+ * @param image - URL of the image to perform erase on
+ * @param options - Inpaint Options
+ */
+export async function erase(
+  this: StabilityAI,
+  ...args: EraseRequest
+): Promise<StabilityAIContentResponse> {
+  const [image, options] = args;
+  const imageFilepath = await Util.downloadImage(image);
+  const maskFilepath = options?.mask
+    ? await Util.downloadImage(options.mask)
+    : undefined;
+
+  const formData: {
+    image: fs.ReadStream;
+    mask?: fs.ReadStream;
+    seed?: number;
+    output_format?: OutputFormat;
+  } = {
+    image: fs.createReadStream(imageFilepath)
+  };
+
+  if (maskFilepath) formData.mask = fs.createReadStream(maskFilepath);
+  if (options?.seed) formData.seed = options.seed;
+  if (options?.outputFormat) formData.output_format = options.outputFormat;
+
+  const response = await axios.postForm(
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.ERASE),
+    axios.toFormData(formData, new FormData()),
+    {
+      validateStatus: undefined,
+      headers: {
+        ...this.authHeaders,
+        Accept: 'application/json',
+      },
+    },
+  );
+
+  fs.unlinkSync(imageFilepath);
+  if (maskFilepath) fs.unlinkSync(maskFilepath);
+
+  if (response.status === 200) {
+    return Util.processContentResponse(
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      'v2beta_stable_image_edit_erase',
+    );
+  }
+
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run stable image erase',
+    response.data,
+  );
 }
 
 export type InpaintRequest = [
