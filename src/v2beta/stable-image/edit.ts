@@ -12,7 +12,7 @@ import StabilityAI from '../..';
 
 const RESOURCE = 'stable-image/edit';
 
-enum Endpoints {
+enum Endpoint {
   ERASE = 'erase',
   INPAINT = 'inpaint',
   OUTPAINT = 'outpaint',
@@ -33,7 +33,7 @@ export type EraseRequest = [
  * Stability AI Stable Image Erase (v2beta)
  *
  * @param image - URL of the image to perform erase on
- * @param options - Inpaint Options
+ * @param options - Erase Options
  */
 export async function erase(
   this: StabilityAI,
@@ -59,7 +59,7 @@ export async function erase(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.ERASE),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.ERASE),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -135,7 +135,7 @@ export async function inpaint(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.INPAINT),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.INPAINT),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -234,7 +234,7 @@ export async function outpaint(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.OUTPAINT),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.OUTPAINT),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -307,7 +307,7 @@ export async function searchAndReplace(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.SEARCH_AND_REPLACE),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.SEARCH_AND_REPLACE),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -365,7 +365,7 @@ export async function removeBackground(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.REMOVE_BACKGROUND),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.REMOVE_BACKGROUND),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,

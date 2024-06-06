@@ -12,7 +12,7 @@ import StabilityAI from '../..';
 
 const RESOURCE = 'stable-image/generate';
 
-enum Endpoints {
+enum Endpoint {
   ULTRA = 'ultra',
   CORE = 'core',
   SD3 = 'sd3',
@@ -61,7 +61,7 @@ export async function ultra(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.ULTRA),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.ULTRA),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -119,7 +119,7 @@ export async function core(
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.CORE),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.CORE),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -218,7 +218,7 @@ export async function sd3(
   }
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.SD3),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.SD3),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,

@@ -308,3 +308,35 @@ test('Stable Image Edit Remove Background - (v2beta/stable-image/edit/remove-bac
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);
+
+test('Stable Image Control Sketch - (v2beta/stable-image/control/sketch)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.control.sketch(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    'a disco ball'
+  );
+
+  console.log(
+    'Stable Image Control Sketch filepath:',
+    result.filepath,
+  );
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
+
+test('Stable Image Control Structure - (v2beta/stable-image/control/structure)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.control.structure(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    'a disco ball'
+  );
+
+  console.log(
+    'Stable Image Control Structure filepath:',
+    result.filepath,
+  );
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);

@@ -11,7 +11,7 @@ import StabilityAI from '..';
 
 const RESOURCE = 'generation';
 
-enum Endpoints {
+enum Endpoint {
   TEXT_TO_IMAGE = 'text-to-image',
   IMAGE_TO_IMAGE = 'image-to-image',
   IMAGE_TO_IMAGE_UPSCALE = 'image-to-image/upscale',
@@ -127,7 +127,7 @@ export async function textToImage(
     Util.makeUrl(
       APIVersion.V1,
       RESOURCE,
-      engineId + '/' + Endpoints.TEXT_TO_IMAGE,
+      engineId + '/' + Endpoint.TEXT_TO_IMAGE,
     ),
     body,
     {
@@ -189,7 +189,7 @@ export async function imageToImage(
     Util.makeUrl(
       APIVersion.V1,
       RESOURCE,
-      engineId + '/' + Endpoints.IMAGE_TO_IMAGE,
+      engineId + '/' + Endpoint.IMAGE_TO_IMAGE,
     ),
     axios.toFormData(formData, new FormData()),
     {
@@ -258,7 +258,7 @@ export async function imageToImageUpscale(
     Util.makeUrl(
       APIVersion.V1,
       RESOURCE,
-      engineId + '/' + Endpoints.IMAGE_TO_IMAGE_UPSCALE,
+      engineId + '/' + Endpoint.IMAGE_TO_IMAGE_UPSCALE,
     ),
     axios.toFormData(formData, new FormData()),
     {
@@ -330,7 +330,7 @@ export async function imageToImageMasking(
     Util.makeUrl(
       APIVersion.V1,
       RESOURCE,
-      engineId + '/' + Endpoints.IMAGE_TO_IMAGE_MASKING,
+      engineId + '/' + Endpoint.IMAGE_TO_IMAGE_MASKING,
     ),
     axios.toFormData(formData, new FormData()),
     {

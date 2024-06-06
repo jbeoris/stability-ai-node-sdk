@@ -3,6 +3,7 @@ import * as V1User from './v1/user';
 import * as V1Engines from './v1/engines';
 import * as V1Generation from './v1/generation';
 import * as V2BetaStableVideoImageToVideo from './v2beta/stable-video/image-to-video';
+import * as V2BetaStableImageControl from './v2beta/stable-image/control';
 import * as V2BetaStableImageEdit from './v2beta/stable-image/edit';
 import * as V2BetaStableImageGenerate from './v2beta/stable-image/generate';
 import * as V2BetaStableImageUpscale from './v2beta/stable-image/upscale';
@@ -83,6 +84,16 @@ class StabilityAI {
           V2BetaStableVideoImageToVideo.imageToVideoResult.bind(this)(...args),
       },
       stableImage: {
+        control: {
+          sketch: (
+            ...args: V2BetaStableImageControl.ControlRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageControl.sketch.bind(this)(...args),
+          structure: (
+            ...args: V2BetaStableImageControl.ControlRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageControl.structure.bind(this)(...args),
+        },
         edit: {
           erase: (
             ...args: V2BetaStableImageEdit.EraseRequest

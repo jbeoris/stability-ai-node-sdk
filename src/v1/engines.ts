@@ -5,7 +5,7 @@ import StabilityAI from '..';
 
 const RESOURCE = 'engines';
 
-enum Endpoints {
+enum Endpoint {
   LIST = 'list',
 }
 
@@ -23,7 +23,7 @@ export type ListResponse = Engine[];
  */
 export async function list(this: StabilityAI): Promise<ListResponse> {
   const response = await axios.get(
-    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.LIST),
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoint.LIST),
     {
       headers: this.orgAuthHeaders,
     },

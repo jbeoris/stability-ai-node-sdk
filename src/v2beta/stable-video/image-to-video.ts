@@ -12,7 +12,7 @@ import StabilityAI from '../..';
 
 const RESOURCE = 'image-to-video';
 
-enum Endpoints {
+enum Endpoint {
   IMAGE_TO_VIDEO = '',
   IMAGE_TO_VIDEO_RESULT = 'result',
 }
@@ -59,7 +59,7 @@ export async function imageToVideo(
   if (options?.seed) formData.seed = options.seed;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.IMAGE_TO_VIDEO),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.IMAGE_TO_VIDEO),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -103,7 +103,7 @@ export async function imageToVideoResult(
     Util.makeUrl(
       APIVersion.V2_BETA,
       RESOURCE,
-      Endpoints.IMAGE_TO_VIDEO_RESULT,
+      Endpoint.IMAGE_TO_VIDEO_RESULT,
     ) + `/${id}`,
     {
       validateStatus: undefined,

@@ -298,6 +298,28 @@ const result = await stability.v2beta.stableImage.edit.removeBackground(
 console.log('Stable Image Edit Remove Background result filepath:', result.filepath);
 ```
 
+### Control - Sketch
+
+```typescript
+const result = await stability.v2beta.stableImage.control.sketch(
+  'https://www.example.com/images/your-image-of-the-earth.png',
+  'a disco ball'
+);
+
+console.log('Stable Image Control Sketch result filepath:', result.filepath);
+```
+
+### Control - Structure
+
+```typescript
+const result = await stability.v2beta.stableImage.control.structure(
+  'https://www.example.com/images/your-image-of-the-earth.png',
+  'a disco ball'
+);
+
+console.log('Stable Image Control Structure result filepath:', result.filepath);
+```
+
 ## Development and testing
 
 Built in TypeScript, tested with Jest.

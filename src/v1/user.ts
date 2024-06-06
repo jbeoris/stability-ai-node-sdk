@@ -5,7 +5,7 @@ import StabilityAI from '..';
 
 const RESOURCE = 'user';
 
-enum Endpoints {
+enum Endpoint {
   ACCOUNT = 'account',
   BALANCE = 'balance',
 }
@@ -29,7 +29,7 @@ export type AccountResponse = {
  */
 export async function account(this: StabilityAI): Promise<AccountResponse> {
   const response = await axios.get(
-    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.ACCOUNT),
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoint.ACCOUNT),
     {
       headers: this.authHeaders,
     },
@@ -63,7 +63,7 @@ export type BalanceResponse = { credits: number };
  */
 export async function balance(this: StabilityAI): Promise<BalanceResponse> {
   const response = await axios.get(
-    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoints.BALANCE),
+    SAIUtil.makeUrl(APIVersion.V1, RESOURCE, Endpoint.BALANCE),
     {
       headers: this.orgAuthHeaders,
     },

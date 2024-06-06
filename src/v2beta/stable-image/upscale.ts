@@ -13,7 +13,7 @@ import StabilityAI from '../..';
 
 const RESOURCE = 'stable-image/upscale';
 
-enum Endpoints {
+enum Endpoint {
   CONSERVATIVE = 'conservative',
   CREATIVE = 'creative',
   CREATIVE_RESULT = 'creative/result',
@@ -63,7 +63,7 @@ export async function conservative(
   if (options?.creativity) formData.creativity = options.creativity;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.CONSERVATIVE),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.CONSERVATIVE),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -140,7 +140,7 @@ export async function startCreative(
   if (options?.creativity) formData.creativity = options.creativity;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.CREATIVE),
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.CREATIVE),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
@@ -186,7 +186,7 @@ export async function fetchCreativeResult(
 ): Promise<CreativeUpscaleResultResponse> {
   const [id, outputFormat] = args;
   const response = await axios.get(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoints.CREATIVE_RESULT) +
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.CREATIVE_RESULT) +
       `/${id}`,
     {
       validateStatus: undefined,
