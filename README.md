@@ -40,13 +40,18 @@ const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 - [Image to Video](#image-to-video)
 
 ### Stable Image (v2beta)
+- [Generate - Ultra](#generate---ultra)
 - [Generate - Core](#generate---core)
 - [Generate - SD3](#generate---sd3)
+- [Upscale - Conservative](#upscale---conservative)
 - [Upscale - Creative](#upscale---creative)
+- [Edit - Erase](#edit---erase)
 - [Edit - Inpaint](#edit---inpaint)
 - [Edit - Outpaint](#edit---outpaint)
 - [Edit - Search and Replace](#edit---search-and-replace)
 - [Edit - Remove Background](#edit---remove-background)
+- [Control - Sketch](#control---sketch)
+- [Control - Structure](#control---structure)
 
 ## User (v1)
 
