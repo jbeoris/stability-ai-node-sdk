@@ -21,6 +21,8 @@ import StabilityAI from 'stability-ai';
 const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 ```
 
+All images passed to this library must be in the format of a local filepath or a public URL.
+
 ## Table of Contents
 
 ### User (v1)
