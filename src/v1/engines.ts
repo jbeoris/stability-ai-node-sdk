@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { APIVersion, StabilityAIError } from '../util';
+import { APIVersion } from '../util';
+import { StabilityAIError } from '../error';
 import * as SAIUtil from '../util';
 import StabilityAI from '..';
 

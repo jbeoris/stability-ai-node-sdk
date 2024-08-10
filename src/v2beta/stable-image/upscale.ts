@@ -4,10 +4,10 @@ import FormData from 'form-data';
 import {
   OutputFormat,
   APIVersion,
-  StabilityAIError,
   StabilityAIContentResponse,
   StabilityAIStatusResult,
 } from '../../util';
+import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
 import StabilityAI from '../..';
 

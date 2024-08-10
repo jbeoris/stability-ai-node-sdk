@@ -3,10 +3,10 @@ import fs from 'fs-extra';
 import FormData from 'form-data';
 import {
   APIVersion,
-  StabilityAIError,
   StabilityAIContentResponse,
   StabilityAIStatusResult,
 } from '../../util';
+import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
 import StabilityAI from '../..';
 
@@ -100,11 +100,8 @@ export async function imageToVideoResult(
 ): Promise<ImageToVideoResultResponse> {
   const [id] = args;
   const response = await axios.get(
-    Util.makeUrl(
-      APIVersion.V2_BETA,
-      RESOURCE,
-      Endpoint.IMAGE_TO_VIDEO_RESULT,
-    ) + `/${id}`,
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.IMAGE_TO_VIDEO_RESULT) +
+      `/${id}`,
     {
       validateStatus: undefined,
       headers: {

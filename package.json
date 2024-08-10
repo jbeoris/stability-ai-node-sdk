@@ -1,6 +1,6 @@
 {
   "name": "stability-ai",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Node SDK for Stability AI REST API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -54,7 +54,6 @@
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "fs-extra": "^11.2.0",
-    "lodash": "^4.17.21",
     "uuid": "^9.0.1"
   }
 }

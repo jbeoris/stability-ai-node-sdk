@@ -1,11 +1,8 @@
 import axios from 'axios';
 import fs from 'fs-extra';
 import FormData from 'form-data';
-import {
-  APIVersion,
-  StabilityAIError,
-  StabilityAIContentResponse,
-} from '../util';
+import { APIVersion, StabilityAIContentResponse } from '../util';
+import { StabilityAIError } from '../error';
 import * as Util from '../util';
 import StabilityAI from '..';
 
@@ -328,7 +325,8 @@ export async function imageToImageMasking(
     ...otherOptions,
   };
 
-  if (maskPath) formData.mask_image = fs.createReadStream(await maskPath.filepath());
+  if (maskPath)
+    formData.mask_image = fs.createReadStream(await maskPath.filepath());
 
   const response = await axios.postForm(
     Util.makeUrl(

@@ -1,11 +1,31 @@
 import StabilityAI from '../index';
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
 let stability: StabilityAI | undefined;
 const makeStability = () =>
   new StabilityAI(process.env.STABILITY_AI_API_KEY || '');
+
+const LOCAL_TEST_FILES = {
+  bird: path.join(__dirname, '..', '..', 'test_data', 'bird.png'),
+  earth: path.join(__dirname, '..', '..', 'test_data', 'earth.jpg'),
+  pacman: path.join(__dirname, '..', '..', 'test_data', 'pacman.jpg'),
+  aztec: path.join(__dirname, '..', '..', 'test_data', 'aztec.jpeg'),
+  bear: path.join(__dirname, '..', '..', 'test_data', 'bear.png'),
+};
+
+const PUBLIC_TEST_URLS = {
+  bird: 'https://storage.googleapis.com/storage.catbird.ai/test-data/bird.png',
+  earth:
+    'https://storage.googleapis.com/storage.catbird.ai/test-data/earth.jpg',
+  pacman:
+    'https://storage.googleapis.com/storage.catbird.ai/test-data/pacman.jpg',
+  aztec:
+    'https://storage.googleapis.com/storage.catbird.ai/test-data/aztec.jpeg',
+  bear: 'https://storage.googleapis.com/storage.catbird.ai/test-data/bear.png',
+};
 
 beforeEach(async () => {
   stability = makeStability();
@@ -81,7 +101,7 @@ test('Image to Image - (v1/generation/image-to-image)', async () => {
   const results = await stability.v1.generation.imageToImage(
     'stable-diffusion-xl-beta-v2-2-2',
     [{ text: 'crazy techincolor surprise', weight: 0.5 }],
-    'https://upload.wikimedia.org/wikipedia/commons/e/e5/Prick%C3%A4tarpucken.jpg',
+    LOCAL_TEST_FILES.pacman,
   );
 
   for (const result of results) {
@@ -95,7 +115,7 @@ test('Image to Image Upscale - (v1/generation/image-to-image/upscale)', async ()
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const results = await stability.v1.generation.imageToImageUpscale(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    LOCAL_TEST_FILES.earth,
     {
       type: 'esrgan',
     },
@@ -114,7 +134,7 @@ test('Image to Image Masking - (v1/generation/image-to-image/masking)', async ()
   const results = await stability.v1.generation.imageToImageMasking(
     'stable-diffusion-xl-beta-v2-2-2',
     [{ text: 'a beautiful ocean', weight: 0.5 }],
-    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
+    LOCAL_TEST_FILES.bird,
     {
       mask_source: 'INIT_IMAGE_ALPHA',
     },
@@ -132,8 +152,9 @@ test('Image to Image Masking - (v1/generation/image-to-image/masking)', async ()
 test('Stable Image Generate Ultra - (v2beta/stale-image/generate/ultra)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
-  const result =
-    await stability.v2beta.stableImage.generate.ultra('a beautiful mountain');
+  const result = await stability.v2beta.stableImage.generate.ultra(
+    'a beautiful mountain',
+  );
 
   console.log('Stable Image Generate Ultra result filepath:', result.filepath);
 
@@ -166,7 +187,7 @@ test('Stable 3D Stable Fast 3D - (v2beta/3d/stable-fast-3d)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stable3D.stableFast3D(
-    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg',
+    PUBLIC_TEST_URLS.bear,
   );
 
   console.log('Stable 3D Stable Fast 3D result filepath:', result.filepath);
@@ -178,7 +199,7 @@ test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableVideo.imageToVideo(
-    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg',
+    LOCAL_TEST_FILES.aztec,
   );
 
   let filepath: string | undefined = undefined;
@@ -207,11 +228,14 @@ test('Stable Image Upscale Conservative - (v2beta/stable-image/upscale/conservat
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.upscale.conservative(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    LOCAL_TEST_FILES.earth,
     'UHD 4k',
   );
 
-  console.log('Stable Image Upscale Conservative result filepath:', result.filepath);
+  console.log(
+    'Stable Image Upscale Conservative result filepath:',
+    result.filepath,
+  );
 
   expect(typeof result.filepath).toBe('string');
 }, 600000);
@@ -220,7 +244,7 @@ test('Stable Image Upscale Creative - (v2beta/stable-image/upscale/creative)', a
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.upscale.startCreative(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    LOCAL_TEST_FILES.earth,
     'UHD 4k',
   );
 
@@ -252,7 +276,7 @@ test('Stable Image Edit Erase - (v2beta/stable-image/edit/erase)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.erase(
-    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png'
+    LOCAL_TEST_FILES.bird,
   );
 
   console.log('Stable Image Edit Erase result filepath:', result.filepath);
@@ -264,7 +288,7 @@ test('Stable Image Edit Inpaint - (v2beta/stable-image/edit/inpaint)', async () 
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.inpaint(
-    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
+    LOCAL_TEST_FILES.bird,
     'disco ball',
   );
 
@@ -277,7 +301,7 @@ test('Stable Image Edit Outpaint - (v2beta/stable-image/edit/outpaint)', async (
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.outpaint(
-    'https://upload.wikimedia.org/wikipedia/commons/6/63/Icon_Bird_512x512.png',
+    LOCAL_TEST_FILES.bird,
     {
       prompt: 'outer space',
       left: 100,
@@ -293,7 +317,7 @@ test('Stable Image Edit Search and Replace - (v2beta/stable-image/edit/search-an
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.searchAndReplace(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    LOCAL_TEST_FILES.earth,
     'a disco ball',
     'the earth',
   );
@@ -310,7 +334,7 @@ test('Stable Image Edit Remove Background - (v2beta/stable-image/edit/remove-bac
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.edit.removeBackground(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    LOCAL_TEST_FILES.earth,
   );
 
   console.log(
@@ -325,14 +349,11 @@ test('Stable Image Control Sketch - (v2beta/stable-image/control/sketch)', async
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.control.sketch(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
-    'a disco ball'
+    LOCAL_TEST_FILES.earth,
+    'a disco ball',
   );
 
-  console.log(
-    'Stable Image Control Sketch filepath:',
-    result.filepath,
-  );
+  console.log('Stable Image Control Sketch filepath:', result.filepath);
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);
@@ -341,14 +362,11 @@ test('Stable Image Control Structure - (v2beta/stable-image/control/structure)',
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.control.structure(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
-    'a disco ball'
+    LOCAL_TEST_FILES.earth,
+    'a disco ball',
   );
 
-  console.log(
-    'Stable Image Control Structure filepath:',
-    result.filepath,
-  );
+  console.log('Stable Image Control Structure filepath:', result.filepath);
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);
@@ -357,14 +375,11 @@ test('Stable Image Control Style - (v2beta/stable-image/control/style)', async (
   if (!stability) throw new Error('StabilityAI instance not found');
 
   const result = await stability.v2beta.stableImage.control.style(
-    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
-    'a disco ball'
+    LOCAL_TEST_FILES.earth,
+    'a disco ball',
   );
 
-  console.log(
-    'Stable Image Control Style filepath:',
-    result.filepath,
-  );
+  console.log('Stable Image Control Style filepath:', result.filepath);
 
   expect(typeof result.filepath).toBe('string');
 }, 60000);

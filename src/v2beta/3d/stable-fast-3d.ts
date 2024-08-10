@@ -1,26 +1,23 @@
 import axios from 'axios';
 import fs from 'fs-extra';
 import FormData from 'form-data';
-import {
-  APIVersion,
-  StabilityAIError,
-  StabilityAIContentResponse
-} from '../../util';
+import { APIVersion, StabilityAIContentResponse } from '../../util';
+import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
 import StabilityAI from '../..';
 
 const RESOURCE = '3d';
 
 enum Endpoint {
-  STABLE_FAST_3D = 'stable-fast-3d'
+  STABLE_FAST_3D = 'stable-fast-3d',
 }
 
 export type StableFast3DRequest = [
   image: string,
   options?: {
-    textureResolution?: number,
-    foregroundRatio?: number
-  }
+    textureResolution?: number;
+    foregroundRatio?: number;
+  },
 ];
 
 /**
@@ -41,20 +38,22 @@ export async function stableFast3D(
     texture_resolution?: number;
     foreground_ratio?: number;
   } = {
-    image: fs.createReadStream(await imagePath.filepath())
+    image: fs.createReadStream(await imagePath.filepath()),
   };
 
-  if (options?.textureResolution) formData.texture_resolution = options.textureResolution;
-  if (options?.foregroundRatio) formData.foreground_ratio = options.foregroundRatio;
+  if (options?.textureResolution)
+    formData.texture_resolution = options.textureResolution;
+  if (options?.foregroundRatio)
+    formData.foreground_ratio = options.foregroundRatio;
 
   const response = await axios.postForm(
     Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.STABLE_FAST_3D),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,
-      responseType: "arraybuffer",
+      responseType: 'arraybuffer',
       headers: {
-        ...this.authHeaders
+        ...this.authHeaders,
       },
     },
   );

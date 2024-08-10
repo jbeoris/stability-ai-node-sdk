@@ -4,9 +4,9 @@ import FormData from 'form-data';
 import {
   OutputFormat,
   APIVersion,
-  StabilityAIError,
   StabilityAIContentResponse,
 } from '../../util';
+import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
 import StabilityAI from '../..';
 
@@ -41,9 +41,7 @@ export async function erase(
 ): Promise<StabilityAIContentResponse> {
   const [image, options] = args;
   const imagePath = new Util.ImagePath(image);
-  const maskPath = options?.mask
-    ? new Util.ImagePath(options.mask)
-    : undefined;
+  const maskPath = options?.mask ? new Util.ImagePath(options.mask) : undefined;
 
   const formData: {
     image: fs.ReadStream;
@@ -51,7 +49,7 @@ export async function erase(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(await imagePath.filepath())
+    image: fs.createReadStream(await imagePath.filepath()),
   };
 
   if (maskPath) formData.mask = fs.createReadStream(await maskPath.filepath());
@@ -112,9 +110,7 @@ export async function inpaint(
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, options] = args;
   const imagePath = new Util.ImagePath(image);
-  const maskPath = options?.mask
-    ? new Util.ImagePath(options.mask)
-    : undefined;
+  const maskPath = options?.mask ? new Util.ImagePath(options.mask) : undefined;
 
   const formData: {
     image: fs.ReadStream;

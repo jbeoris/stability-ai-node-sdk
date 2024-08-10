@@ -41,63 +41,63 @@ export function makeUrl(
   return `${STABILITY_AI_BASE_URL}/${verison}/${resource}${endpoint.length > 0 ? `/${endpoint}` : ''}`;
 }
 
-export function isUrl(str: string): boolean {
-  try {
-    new URL(str);
-    return true;
-  } catch {
-    return false;
-  }
+function isUrl(str: string): boolean {
+  const urlPattern =
+    /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+  return urlPattern.test(str);
 }
 
-export function isFilePath(str: string): boolean {
-  return path.isAbsolute(str) || str.startsWith('./') || str.startsWith('../');
+function isFilePath(str: string): boolean {
+  const filePathPattern = /^(.+\/)?([^\/]+)$/;
+  return filePathPattern.test(str) && !isUrl(str);
 }
 
 export class ImagePath {
-    private resource: string;
-    private downloadFilepath?: string;
-    private type: 'download' | 'local';
+  private resource: string;
+  private downloadFilepath?: string;
+  private type: 'download' | 'local';
 
-    constructor(resource: string) {
-        this.resource = resource;
-        if (isUrl(resource)) {
-            this.type = 'download';
-        } else if (isFilePath(resource)) {
-            this.type = 'local';
-        } else {
-            throw new Error('Invalid image resource. Must be local filepath or public image URL.');
-        }
+  constructor(resource: string) {
+    this.resource = resource;
+    if (isUrl(resource)) {
+      this.type = 'download';
+    } else if (isFilePath(resource)) {
+      this.type = 'local';
+    } else {
+      throw new Error(
+        'Invalid image resource. Must be local filepath or public image URL.',
+      );
     }
+  }
 
-    async filepath() {
-        switch (this.type) {
-            case 'local': {
-                return this.resource;
-            }
-            case 'download': {
-                if (this.downloadFilepath) return this.downloadFilepath;
+  async filepath() {
+    switch (this.type) {
+      case 'local': {
+        return this.resource;
+      }
+      case 'download': {
+        if (this.downloadFilepath) return this.downloadFilepath;
 
-                this.downloadFilepath = await downloadImage(this.resource);
-                return this.downloadFilepath;
-            }
-        }
+        this.downloadFilepath = await downloadImage(this.resource);
+        return this.downloadFilepath;
+      }
     }
+  }
 
-    cleanup() {
-        switch (this.type) {
-            case 'download': {
-                if (this.downloadFilepath) {
-                    fs.unlinkSync(this.downloadFilepath);
-                    this.downloadFilepath = undefined;
-                }
-            }
-            default: {
-                break;
-            }
+  cleanup() {
+    switch (this.type) {
+      case 'download': {
+        if (this.downloadFilepath) {
+          fs.unlinkSync(this.downloadFilepath);
+          this.downloadFilepath = undefined;
         }
+      }
+      default: {
+        break;
+      }
     }
-} 
+  }
+}
 
 /**
  * Download an image from a URL and return the local file path
@@ -173,48 +173,4 @@ export async function processContentResponse(
     errored: finishReason === 'ERROR',
     seed: data.seed,
   };
-}
-
-// ERROR HANDLING
-
-export type StabilityAIErrorName =
-  | 'StabilityAIInvalidRequestError'
-  | 'StabilityAIUnauthorizedError'
-  | 'StabilityAIContentModerationError'
-  | 'StabilityAIRecordNotFoundError'
-  | 'StabilityAIUnknownError';
-
-export class StabilityAIError extends Error {
-  constructor(status: number, message: string, data?: any) {
-    let dataMessage: string;
-
-    try {
-      dataMessage = JSON.stringify(data);
-    } catch {
-      dataMessage = '';
-    }
-
-    const fullMessage = `${message}: ${dataMessage}`;
-
-    super(fullMessage);
-
-    let name: StabilityAIErrorName = 'StabilityAIUnknownError';
-
-    switch (status) {
-      case 400:
-        name = 'StabilityAIInvalidRequestError';
-        break;
-      case 401:
-        name = 'StabilityAIUnauthorizedError';
-        break;
-      case 403:
-        name = 'StabilityAIContentModerationError';
-        break;
-      case 404:
-        name = 'StabilityAIRecordNotFoundError';
-        break;
-    }
-
-    this.name = name;
-  }
 }

@@ -4,9 +4,9 @@ import FormData from 'form-data';
 import {
   OutputFormat,
   APIVersion,
-  StabilityAIError,
   StabilityAIContentResponse,
 } from '../../util';
+import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
 import StabilityAI from '../..';
 import { AspectRatio } from './generate';
@@ -16,7 +16,7 @@ const RESOURCE = 'stable-image/control';
 enum Endpoint {
   SKETCH = 'sketch',
   STRUCTURE = 'structure',
-  STYLE = 'style'
+  STYLE = 'style',
 }
 
 export type ControlRequest = [
@@ -75,10 +75,10 @@ async function control(
     output_format?: OutputFormat;
   } = {
     image: fs.createReadStream(await imagePath.filepath()),
-    prompt
+    prompt,
   };
 
-  if (options?.controlStrength) 
+  if (options?.controlStrength)
     formData.control_strength = options.controlStrength;
   if (options?.negativePrompt)
     formData.negative_prompt = options.negativePrompt;
@@ -150,15 +150,13 @@ export async function style(
     output_format?: OutputFormat;
   } = {
     image: fs.createReadStream(await imagePath.filepath()),
-    prompt
+    prompt,
   };
 
   if (options?.negativePrompt)
     formData.negative_prompt = options.negativePrompt;
-  if (options?.aspectRatio) 
-    formData.aspect_ratio = options.aspectRatio;
-  if (options?.fidelity) 
-    formData.fidelity = options.fidelity;
+  if (options?.aspectRatio) formData.aspect_ratio = options.aspectRatio;
+  if (options?.fidelity) formData.fidelity = options.fidelity;
   if (options?.seed) formData.seed = options.seed;
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 

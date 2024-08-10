@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import * as V1User from './v1/user';
 import * as V1Engines from './v1/engines';
 import * as V1Generation from './v1/generation';
@@ -36,7 +35,10 @@ class StabilityAI {
     if (this.clientId) headers['Stability-Client-ID'] = this.clientId;
     if (this.clientVersion)
       headers['Stability-Client-Version'] = this.clientVersion;
-    return _.merge(this.authHeaders, headers);
+    return {
+      ...this.authHeaders,
+      ...headers,
+    };
   }
 
   public get v1() {
