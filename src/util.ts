@@ -19,8 +19,8 @@ export const DEFAULT_OUTPUT_FORMAT: OutputFormat = 'png';
 export type StabilityAIContentResponse = {
   filepath: string;
   filename: string;
-  contentType: 'image' | 'video';
-  outputFormat: OutputFormat | 'mp4';
+  contentType: 'image' | 'video' | '3d';
+  outputFormat: OutputFormat | 'mp4' | 'glb';
   contentFiltered: boolean;
   errored: boolean;
   seed: number;
@@ -40,6 +40,64 @@ export function makeUrl(
 ) {
   return `${STABILITY_AI_BASE_URL}/${verison}/${resource}${endpoint.length > 0 ? `/${endpoint}` : ''}`;
 }
+
+export function isUrl(str: string): boolean {
+  try {
+    new URL(str);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function isFilePath(str: string): boolean {
+  return path.isAbsolute(str) || str.startsWith('./') || str.startsWith('../');
+}
+
+export class ImagePath {
+    private resource: string;
+    private downloadFilepath?: string;
+    private type: 'download' | 'local';
+
+    constructor(resource: string) {
+        this.resource = resource;
+        if (isUrl(resource)) {
+            this.type = 'download';
+        } else if (isFilePath(resource)) {
+            this.type = 'local';
+        } else {
+            throw new Error('Invalid image resource. Must be local filepath or public image URL.');
+        }
+    }
+
+    async filepath() {
+        switch (this.type) {
+            case 'local': {
+                return this.resource;
+            }
+            case 'download': {
+                if (this.downloadFilepath) return this.downloadFilepath;
+
+                this.downloadFilepath = await downloadImage(this.resource);
+                return this.downloadFilepath;
+            }
+        }
+    }
+
+    cleanup() {
+        switch (this.type) {
+            case 'download': {
+                if (this.downloadFilepath) {
+                    fs.unlinkSync(this.downloadFilepath);
+                    this.downloadFilepath = undefined;
+                }
+            }
+            default: {
+                break;
+            }
+        }
+    }
+} 
 
 /**
  * Download an image from a URL and return the local file path
@@ -67,6 +125,27 @@ export async function downloadImage(url: string) {
     }
   });
   return filepath;
+}
+
+export async function processArrayBufferResponse(
+  data: any,
+  outputFormat: 'glb',
+  resource: string,
+): Promise<StabilityAIContentResponse> {
+  const filename = `${resource}_${uuidv4()}.${outputFormat}`;
+  const filepath = path.join(os.tmpdir(), filename);
+
+  await fs.writeFile(filepath, Buffer.from(data));
+
+  return {
+    filepath,
+    filename,
+    contentType: '3d',
+    outputFormat,
+    contentFiltered: false,
+    errored: false,
+    seed: data.seed,
+  };
 }
 
 export async function processContentResponse(

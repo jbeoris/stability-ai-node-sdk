@@ -33,7 +33,7 @@ export type ConservativeUpscaleRequest = [
 /**
  * Stability AI Stable Image Conservative Upscale (v2beta)
  *
- * @param image - URL of the image to upscale
+ * @param image - Local filepath or public URL of the image to upscale
  * @param prompt - Prompt to use for upscaling
  * @param options - Extra options for the upscale
  */
@@ -42,7 +42,7 @@ export async function conservative(
   ...args: ConservativeUpscaleRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, options] = args;
-  const filepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -52,7 +52,7 @@ export async function conservative(
     seed?: number;
     creativity?: number;
   } = {
-    image: fs.createReadStream(filepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     prompt,
   };
 
@@ -74,7 +74,7 @@ export async function conservative(
     },
   );
 
-  if (filepath) fs.unlinkSync(filepath);
+  imagePath.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -110,7 +110,7 @@ export type CreativeUpscaleResponse = {
 /**
  * Stability AI Stable Image Start Creative Upscale (v2beta)
  *
- * @param image - URL of the image to upscale
+ * @param image - Local filepath or public URL of the image to upscale
  * @param prompt - Prompt to use for upscaling
  * @param options - Extra options for the upscale
  */
@@ -119,7 +119,7 @@ export async function startCreative(
   ...args: CreativeUpscaleRequest
 ): Promise<CreativeUpscaleResponse> {
   const [image, prompt, options] = args;
-  const filepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -129,7 +129,7 @@ export async function startCreative(
     seed?: number;
     creativity?: number;
   } = {
-    image: fs.createReadStream(filepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     prompt,
   };
 
@@ -148,7 +148,7 @@ export async function startCreative(
     },
   );
 
-  fs.unlinkSync(filepath);
+  imagePath.cleanup();
 
   if (response.status === 200 && typeof response.data.id === 'string') {
     return {

@@ -32,7 +32,7 @@ export type EraseRequest = [
 /**
  * Stability AI Stable Image Erase (v2beta)
  *
- * @param image - URL of the image to perform erase on
+ * @param image - Local filepath or public URL of the image to perform erase on
  * @param options - Erase Options
  */
 export async function erase(
@@ -40,9 +40,9 @@ export async function erase(
   ...args: EraseRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
-  const maskFilepath = options?.mask
-    ? await Util.downloadImage(options.mask)
+  const imagePath = new Util.ImagePath(image);
+  const maskPath = options?.mask
+    ? new Util.ImagePath(options.mask)
     : undefined;
 
   const formData: {
@@ -51,10 +51,10 @@ export async function erase(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath)
+    image: fs.createReadStream(await imagePath.filepath())
   };
 
-  if (maskFilepath) formData.mask = fs.createReadStream(maskFilepath);
+  if (maskPath) formData.mask = fs.createReadStream(await maskPath.filepath());
   if (options?.seed) formData.seed = options.seed;
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
@@ -70,8 +70,8 @@ export async function erase(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
-  if (maskFilepath) fs.unlinkSync(maskFilepath);
+  imagePath.cleanup();
+  maskPath?.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -102,7 +102,7 @@ export type InpaintRequest = [
 /**
  * Stability AI Stable Image Inpaint (v2beta)
  *
- * @param image - URL of the image to inpaint
+ * @param image - Local filepath or public URL of the image to inpaint
  * @param prompt - Prompt to use for inpainting
  * @param options - Inpaint Options
  */
@@ -111,9 +111,9 @@ export async function inpaint(
   ...args: InpaintRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
-  const maskFilepath = options?.mask
-    ? await Util.downloadImage(options.mask)
+  const imagePath = new Util.ImagePath(image);
+  const maskPath = options?.mask
+    ? new Util.ImagePath(options.mask)
     : undefined;
 
   const formData: {
@@ -124,11 +124,11 @@ export async function inpaint(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     prompt,
   };
 
-  if (maskFilepath) formData.mask = fs.createReadStream(maskFilepath);
+  if (maskPath) formData.mask = fs.createReadStream(await maskPath.filepath());
   if (options?.negativePrompt)
     formData.negative_prompt = options.negativePrompt;
   if (options?.seed) formData.seed = options.seed;
@@ -146,8 +146,8 @@ export async function inpaint(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
-  if (maskFilepath) fs.unlinkSync(maskFilepath);
+  imagePath.cleanup();
+  maskPath?.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -201,7 +201,7 @@ export type OutpaintRequest = [
 /**
  * Stability AI Stable Image Outpaint (v2beta)
  *
- * @param image - URL of the image to outpaint
+ * @param image - Local filepath or public URL of the image to outpaint
  * @param prompt - Prompt to use for outpainting
  * @param options - Outpaint Options
  */
@@ -210,7 +210,7 @@ export async function outpaint(
   ...args: OutpaintRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -222,7 +222,7 @@ export async function outpaint(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
   };
 
   if (options?.left) formData.left = options.left;
@@ -245,7 +245,7 @@ export async function outpaint(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
+  imagePath.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -276,7 +276,7 @@ export type SearchAndReplaceRequest = [
 /**
  * Stability AI Stable Image Search and Replace (v2beta)
  *
- * @param image - URL of the image to search and replace
+ * @param image - Local filepath or public URL of the image to search and replace
  * @param prompt - Prompt to use for search and replace
  * @param searchPrompt - Prompt to search for
  * @param options - Search and Replace Options
@@ -286,7 +286,7 @@ export async function searchAndReplace(
   ...args: SearchAndReplaceRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, searchPrompt, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -296,7 +296,7 @@ export async function searchAndReplace(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     prompt,
     search_prompt: searchPrompt,
   };
@@ -318,7 +318,7 @@ export async function searchAndReplace(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
+  imagePath.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -345,7 +345,7 @@ export type RemoveBackgroundRequest = [
 /**
  * Stability AI Stable Image Remove Background (v2beta)
  *
- * @param image - URL of the image to remove the background from
+ * @param image - Local filepath or public URL of the image to remove the background from
  * @param options - Remove Background Options
  */
 export async function removeBackground(
@@ -353,13 +353,13 @@ export async function removeBackground(
   ...args: RemoveBackgroundRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
   };
 
   if (options?.outputFormat) formData.output_format = options.outputFormat;
@@ -376,7 +376,7 @@ export async function removeBackground(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
+  imagePath.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(

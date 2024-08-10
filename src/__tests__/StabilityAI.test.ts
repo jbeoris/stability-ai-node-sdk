@@ -162,6 +162,18 @@ test('Stable Image Generate SD3 - (v2beta/stale-image/generate/sd3)', async () =
   expect(typeof result.filepath).toBe('string');
 }, 600000);
 
+test('Stable 3D Stable Fast 3D - (v2beta/3d/stable-fast-3d)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stable3D.stableFast3D(
+    'https://cdn-uploads.huggingface.co/production/uploads/1669639889631-624d53894778284ac5d47ea2.jpeg',
+  );
+
+  console.log('Stable 3D Stable Fast 3D result filepath:', result.filepath);
+
+  expect(typeof result.filepath).toBe('string');
+}, 600000);
+
 test('Stable Video Image to Video - (v2beta/image-to-video)', async () => {
   if (!stability) throw new Error('StabilityAI instance not found');
 
@@ -335,6 +347,22 @@ test('Stable Image Control Structure - (v2beta/stable-image/control/structure)',
 
   console.log(
     'Stable Image Control Structure filepath:',
+    result.filepath,
+  );
+
+  expect(typeof result.filepath).toBe('string');
+}, 60000);
+
+test('Stable Image Control Style - (v2beta/stable-image/control/style)', async () => {
+  if (!stability) throw new Error('StabilityAI instance not found');
+
+  const result = await stability.v2beta.stableImage.control.style(
+    'https://live.staticflickr.com/7151/6760135001_58b1c5c5f0_b.jpg',
+    'a disco ball'
+  );
+
+  console.log(
+    'Stable Image Control Style filepath:',
     result.filepath,
   );
 

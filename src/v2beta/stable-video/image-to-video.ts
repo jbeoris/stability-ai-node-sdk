@@ -31,7 +31,7 @@ export type ImageToVideoResponse = { id: string };
 /**
  * Stability AI Stable Video Image to Video (v2beta)
  *
- * @param image - URL of the image to convert to video
+ * @param image - URL or filepath of the image to convert to video
  * @param options - Image to Video Options
  */
 export async function imageToVideo(
@@ -43,7 +43,7 @@ export async function imageToVideo(
     seed?: number;
   },
 ): Promise<ImageToVideoResponse> {
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -51,7 +51,7 @@ export async function imageToVideo(
     cfg_scale: number;
     seed?: number;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     motion_bucket_id: motionBucketId,
     cfg_scale: cfgScale,
   };
@@ -70,7 +70,7 @@ export async function imageToVideo(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
+  imagePath.cleanup();
 
   if (response.status === 200 && typeof response.data.id === 'string') {
     return { id: response.data.id };

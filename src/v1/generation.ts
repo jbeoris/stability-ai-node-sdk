@@ -177,10 +177,10 @@ export async function imageToImage(
   ...args: ImageToImageOptions
 ): Promise<StabilityAIContentResponse[]> {
   const [engineId, textPrompts, initImage, options] = args;
-  const imageFilepath = await Util.downloadImage(initImage);
+  const imagePath = new Util.ImagePath(initImage);
 
   const formData: any = {
-    init_image: fs.createReadStream(imageFilepath),
+    init_image: fs.createReadStream(await imagePath.filepath()),
     text_prompts: textPrompts,
     ...(options || {}),
   };
@@ -200,6 +200,8 @@ export async function imageToImage(
       },
     },
   );
+
+  imagePath.cleanup();
 
   if (response.status === 200 && Array.isArray(response.data.artifacts)) {
     return processArtifacts(response.data.artifacts);
@@ -240,7 +242,7 @@ export async function imageToImageUpscale(
   ...args: ImageToImageUpscaleOptions
 ): Promise<StabilityAIContentResponse[]> {
   const [image, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const { type, ...typeOptions } = options;
 
@@ -250,7 +252,7 @@ export async function imageToImageUpscale(
       : 'stable-diffusion-x4-latent-upscaler';
 
   const formData: any = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     ...typeOptions,
   };
 
@@ -269,6 +271,8 @@ export async function imageToImageUpscale(
       },
     },
   );
+
+  imagePath.cleanup();
 
   if (response.status === 200 && Array.isArray(response.data.artifacts)) {
     return processArtifacts(response.data.artifacts);
@@ -305,12 +309,12 @@ export async function imageToImageMasking(
   ...args: ImageToImageMaskingOptions
 ): Promise<StabilityAIContentResponse[]> {
   const [engineId, textPrompts, initImage, options] = args;
-  const imageFilepath = await Util.downloadImage(initImage);
-  let maskFilepath: string | undefined = undefined;
+  const imagePath = new Util.ImagePath(initImage);
+  let maskPath: Util.ImagePath | undefined = undefined;
   let otherOptions: any;
 
   if ('mask_image' in options) {
-    maskFilepath = await Util.downloadImage(options.mask_image);
+    maskPath = new Util.ImagePath(options.mask_image);
     const { mask_image, ...other } = options;
     otherOptions = other;
   } else {
@@ -319,12 +323,12 @@ export async function imageToImageMasking(
   }
 
   const formData: any = {
-    init_image: fs.createReadStream(imageFilepath),
+    init_image: fs.createReadStream(await imagePath.filepath()),
     text_prompts: textPrompts,
     ...otherOptions,
   };
 
-  if (maskFilepath) formData.mask_image = fs.createReadStream(maskFilepath);
+  if (maskPath) formData.mask_image = fs.createReadStream(await maskPath.filepath());
 
   const response = await axios.postForm(
     Util.makeUrl(
@@ -341,6 +345,9 @@ export async function imageToImageMasking(
       },
     },
   );
+
+  imagePath.cleanup();
+  maskPath?.cleanup();
 
   if (response.status === 200 && Array.isArray(response.data.artifacts)) {
     return processArtifacts(response.data.artifacts);

@@ -9,12 +9,14 @@ import {
 } from '../../util';
 import * as Util from '../../util';
 import StabilityAI from '../..';
+import { AspectRatio } from './generate';
 
 const RESOURCE = 'stable-image/control';
 
 enum Endpoint {
   SKETCH = 'sketch',
-  STRUCTURE = 'structure'
+  STRUCTURE = 'structure',
+  STYLE = 'style'
 }
 
 export type ControlRequest = [
@@ -31,7 +33,7 @@ export type ControlRequest = [
 /**
  * Stability AI Stable Image Control Sketch (v2beta)
  *
- * @param image - URL of the image to control sketch
+ * @param image - Local filepath or public URL of the image to control sketch
  * @param prompt - Prompt to use for control sketch
  * @param options - Control sketch Options
  */
@@ -45,7 +47,7 @@ export async function sketch(
 /**
  * Stability AI Stable Image Control Structure (v2beta)
  *
- * @param image - URL of the image to control structure
+ * @param image - Local filepath or public URL of the image to control structure
  * @param prompt - Prompt to use for control structure
  * @param options - Control structure Options
  */
@@ -62,7 +64,7 @@ async function control(
   ...args: ControlRequest
 ): Promise<StabilityAIContentResponse> {
   const [image, prompt, options] = args;
-  const imageFilepath = await Util.downloadImage(image);
+  const imagePath = new Util.ImagePath(image);
 
   const formData: {
     image: fs.ReadStream;
@@ -72,7 +74,7 @@ async function control(
     seed?: number;
     output_format?: OutputFormat;
   } = {
-    image: fs.createReadStream(imageFilepath),
+    image: fs.createReadStream(await imagePath.filepath()),
     prompt
   };
 
@@ -95,7 +97,7 @@ async function control(
     },
   );
 
-  fs.unlinkSync(imageFilepath);
+  imagePath.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(
@@ -108,6 +110,83 @@ async function control(
   throw new StabilityAIError(
     response.status,
     `Failed to run stable image control ${endpoint}`,
+    response.data,
+  );
+}
+
+export type ControlStyleRequest = [
+  image: string,
+  prompt: string,
+  options?: {
+    negativePrompt?: string;
+    aspectRatio?: AspectRatio;
+    fidelity?: number;
+    seed?: number;
+    outputFormat?: OutputFormat;
+  },
+];
+
+/**
+ * Stability AI Stable Image Control Style (v2beta)
+ *
+ * @param image - Local filepath or public URL of the image to control style
+ * @param prompt - Prompt to use for control style
+ * @param options - Control style Options
+ */
+export async function style(
+  this: StabilityAI,
+  ...args: ControlStyleRequest
+): Promise<StabilityAIContentResponse> {
+  const [image, prompt, options] = args;
+  const imagePath = new Util.ImagePath(image);
+
+  const formData: {
+    image: fs.ReadStream;
+    prompt: string;
+    negative_prompt?: string;
+    aspect_ratio?: string;
+    fidelity?: number;
+    seed?: number;
+    output_format?: OutputFormat;
+  } = {
+    image: fs.createReadStream(await imagePath.filepath()),
+    prompt
+  };
+
+  if (options?.negativePrompt)
+    formData.negative_prompt = options.negativePrompt;
+  if (options?.aspectRatio) 
+    formData.aspect_ratio = options.aspectRatio;
+  if (options?.fidelity) 
+    formData.fidelity = options.fidelity;
+  if (options?.seed) formData.seed = options.seed;
+  if (options?.outputFormat) formData.output_format = options.outputFormat;
+
+  const response = await axios.postForm(
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.STYLE),
+    axios.toFormData(formData, new FormData()),
+    {
+      validateStatus: undefined,
+      headers: {
+        ...this.authHeaders,
+        Accept: 'application/json',
+      },
+    },
+  );
+
+  imagePath.cleanup();
+
+  if (response.status === 200) {
+    return Util.processContentResponse(
+      response.data,
+      options?.outputFormat || Util.DEFAULT_OUTPUT_FORMAT,
+      `v2beta_stable_image_control_style`,
+    );
+  }
+
+  throw new StabilityAIError(
+    response.status,
+    `Failed to run stable image control style`,
     response.data,
   );
 }

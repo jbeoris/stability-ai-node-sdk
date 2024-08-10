@@ -2,6 +2,7 @@ import _ from 'lodash';
 import * as V1User from './v1/user';
 import * as V1Engines from './v1/engines';
 import * as V1Generation from './v1/generation';
+import * as V2Beta3DStableFast3D from './v2beta/3d/stable-fast-3d';
 import * as V2BetaStableVideoImageToVideo from './v2beta/stable-video/image-to-video';
 import * as V2BetaStableImageControl from './v2beta/stable-image/control';
 import * as V2BetaStableImageEdit from './v2beta/stable-image/edit';
@@ -73,6 +74,12 @@ class StabilityAI {
 
   public get v2beta() {
     return {
+      stable3D: {
+        stableFast3D: (
+          ...args: V2Beta3DStableFast3D.StableFast3DRequest
+        ): Promise<StabilityAIContentResponse> =>
+          V2Beta3DStableFast3D.stableFast3D.bind(this)(...args),
+      },
       stableVideo: {
         imageToVideo: (
           ...args: V2BetaStableVideoImageToVideo.ImageToVideoRequest
@@ -93,6 +100,10 @@ class StabilityAI {
             ...args: V2BetaStableImageControl.ControlRequest
           ): Promise<StabilityAIContentResponse> =>
             V2BetaStableImageControl.structure.bind(this)(...args),
+          style: (
+            ...args: V2BetaStableImageControl.ControlStyleRequest
+          ): Promise<StabilityAIContentResponse> =>
+            V2BetaStableImageControl.style.bind(this)(...args),
         },
         edit: {
           erase: (

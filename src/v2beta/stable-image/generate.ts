@@ -183,7 +183,7 @@ export async function sd3(
   ...args: SD3Request
 ): Promise<StabilityAIContentResponse> {
   const [prompt, options] = args;
-  let filepath: string | undefined = undefined;
+  let imagePath: Util.ImagePath | undefined = undefined;
 
   const formData: any = {
     prompt,
@@ -197,9 +197,9 @@ export async function sd3(
 
   switch (options?.mode) {
     case 'image-to-image':
-      filepath = await Util.downloadImage(options.image);
+      imagePath = new Util.ImagePath(options.image);
       formData.strength = options.strength;
-      formData.image = fs.createReadStream(filepath);
+      formData.image = fs.createReadStream(await imagePath.filepath());
       break;
     case 'text-to-image':
     default:
@@ -229,7 +229,7 @@ export async function sd3(
     },
   );
 
-  if (filepath) fs.unlinkSync(filepath);
+  imagePath?.cleanup();
 
   if (response.status === 200) {
     return Util.processContentResponse(

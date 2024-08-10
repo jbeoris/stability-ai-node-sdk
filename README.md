@@ -36,6 +36,9 @@ const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 - [Image to Image - Upscale](#image-to-image---upscale)
 - [Image to Image - Masking](#image-to-image---masking)
 
+### 3D (v2beta)
+- [Stable Fast 3D](#stable-fast-3d)
+
 ### Stable Video (v2beta)
 - [Image to Video](#image-to-video)
 
@@ -52,6 +55,7 @@ const stability = new StabilityAI(process.env.STABILITY_AI_API_KEY);
 - [Edit - Remove Background](#edit---remove-background)
 - [Control - Sketch](#control---sketch)
 - [Control - Structure](#control---structure)
+- [Control - Style](#control---style)
 
 ## User (v1)
 
@@ -149,6 +153,18 @@ const results = await stability.v1.generation.imageToImageMasking(
 for (const result of results) {
   console.log('Image to image masking result filepath:', result.filepath);
 }
+```
+
+## 3D (v2beta)
+
+### Stable Fast 3D
+
+``` typescript
+  const result = await stability.v2beta.stable3D.stableFast3D(
+    'https://www.example.com/images/photo-you-want-to-move.png'
+  );
+
+  console.log('Stable 3D Stable Fast 3D result filepath:', result.filepath);
 ```
 
 ## Stable Video (v2beta)
@@ -325,6 +341,17 @@ const result = await stability.v2beta.stableImage.control.structure(
 console.log('Stable Image Control Structure result filepath:', result.filepath);
 ```
 
+### Control - Style
+
+```typescript
+const result = await stability.v2beta.stableImage.control.style(
+  'https://www.example.com/images/your-image-of-the-earth.png',
+  'a disco ball'
+);
+
+console.log('Stable Image Control Style result filepath:', result.filepath);
+```
+
 ## Development and testing
 
 Built in TypeScript, tested with Jest.
@@ -337,7 +364,7 @@ $ yarn test
 Road Map
 
 ```
-- Support local files
+- Add input validation for filetypes, dimensions, etc (Zod integration as candidate for this).
 - Support output to S3/GCS bucket
 - Wrap job/result methods into one async task w/ internal polling
 ```
