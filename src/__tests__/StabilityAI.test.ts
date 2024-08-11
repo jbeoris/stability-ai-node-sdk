@@ -1,6 +1,7 @@
 import StabilityAI from '../index';
 import dotenv from 'dotenv';
 import path from 'path';
+import * as Util from '../util';
 
 dotenv.config();
 
@@ -33,6 +34,21 @@ beforeEach(async () => {
 
 afterEach(async () => {
   // do nothing yet
+});
+
+const TEST_URL =
+  'https://ik.imagekit.io/newcompute/tr:h-2048,w-2048,c-at_max,q-100,f-jpg/users/9989128762560512/assets/f301bc58-a296-47e0-8560-85fb50a9ef40.jpg';
+
+test('Util.isValidHttpUrl', async () => {
+  expect(Util.isValidHttpUrl(TEST_URL)).toBe(true);
+  expect(Util.isValidHttpUrl(PUBLIC_TEST_URLS.bird)).toBe(true);
+  expect(Util.isValidHttpUrl(LOCAL_TEST_FILES.bird)).toBe(false);
+});
+
+test('Util.isValidFile', async () => {
+  expect(Util.isValidFile(TEST_URL)).toBe(false);
+  expect(Util.isValidFile(PUBLIC_TEST_URLS.bird)).toBe(false);
+  expect(Util.isValidFile(LOCAL_TEST_FILES.bird)).toBe(true);
 });
 
 // v1/user

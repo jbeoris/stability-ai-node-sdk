@@ -41,15 +41,21 @@ export function makeUrl(
   return `${STABILITY_AI_BASE_URL}/${verison}/${resource}${endpoint.length > 0 ? `/${endpoint}` : ''}`;
 }
 
-function isUrl(str: string): boolean {
-  const urlPattern =
-    /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-  return urlPattern.test(str);
+export function isValidHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (err) {
+    return false;
+  }
 }
 
-function isFilePath(str: string): boolean {
-  const filePathPattern = /^(.+\/)?([^\/]+)$/;
-  return filePathPattern.test(str) && !isUrl(str);
+export function isValidFile(value: string): boolean {
+  try {
+    return fs.statSync(value).isFile();
+  } catch (err) {
+    return false;
+  }
 }
 
 export class ImagePath {
@@ -59,9 +65,9 @@ export class ImagePath {
 
   constructor(resource: string) {
     this.resource = resource;
-    if (isUrl(resource)) {
+    if (isValidHttpUrl(resource)) {
       this.type = 'download';
-    } else if (isFilePath(resource)) {
+    } else if (isValidFile(resource)) {
       this.type = 'local';
     } else {
       throw new Error(
