@@ -423,11 +423,11 @@ export async function replaceBackgroundAndRelight(
 ): Promise<ReplaceBackgroundAndRelightResponse> {
   const [image, options] = args;
   const imagePath = new Util.ImagePath(image);
-  const backgroundRefPath = options?.backgroundReference 
-    ? new Util.ImagePath(options.backgroundReference) 
+  const backgroundRefPath = options?.backgroundReference
+    ? new Util.ImagePath(options.backgroundReference)
     : undefined;
-  const lightRefPath = options?.lightReference 
-    ? new Util.ImagePath(options.lightReference) 
+  const lightRefPath = options?.lightReference
+    ? new Util.ImagePath(options.lightReference)
     : undefined;
 
   const formData: Record<string, any> = {
@@ -436,28 +436,43 @@ export async function replaceBackgroundAndRelight(
 
   // Required: either background_reference or background_prompt
   if (backgroundRefPath) {
-    formData.background_reference = fs.createReadStream(await backgroundRefPath.filepath());
+    formData.background_reference = fs.createReadStream(
+      await backgroundRefPath.filepath(),
+    );
   }
   if (options?.backgroundPrompt) {
     formData.background_prompt = options.backgroundPrompt;
   }
 
   // Optional parameters
-  if (options?.foregroundPrompt) formData.foreground_prompt = options.foregroundPrompt;
-  if (options?.negativePrompt) formData.negative_prompt = options.negativePrompt;
-  if (options?.preserveOriginalSubject) formData.preserve_original_subject = options.preserveOriginalSubject;
-  if (options?.originalBackgroundDepth) formData.original_background_depth = options.originalBackgroundDepth;
-  if (options?.keepOriginalBackground) formData.keep_original_background = options.keepOriginalBackground;
-  if (options?.lightSourceDirection) formData.light_source_direction = options.lightSourceDirection;
+  if (options?.foregroundPrompt)
+    formData.foreground_prompt = options.foregroundPrompt;
+  if (options?.negativePrompt)
+    formData.negative_prompt = options.negativePrompt;
+  if (options?.preserveOriginalSubject)
+    formData.preserve_original_subject = options.preserveOriginalSubject;
+  if (options?.originalBackgroundDepth)
+    formData.original_background_depth = options.originalBackgroundDepth;
+  if (options?.keepOriginalBackground)
+    formData.keep_original_background = options.keepOriginalBackground;
+  if (options?.lightSourceDirection)
+    formData.light_source_direction = options.lightSourceDirection;
   if (lightRefPath) {
-    formData.light_reference = fs.createReadStream(await lightRefPath.filepath());
+    formData.light_reference = fs.createReadStream(
+      await lightRefPath.filepath(),
+    );
   }
-  if (options?.lightSourceStrength) formData.light_source_strength = options.lightSourceStrength;
+  if (options?.lightSourceStrength)
+    formData.light_source_strength = options.lightSourceStrength;
   if (options?.seed) formData.seed = options.seed;
   if (options?.outputFormat) formData.output_format = options.outputFormat;
 
   const response = await axios.postForm(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, 'replace-background-and-relight'),
+    Util.makeUrl(
+      APIVersion.V2_BETA,
+      RESOURCE,
+      'replace-background-and-relight',
+    ),
     axios.toFormData(formData, new FormData()),
     {
       validateStatus: undefined,

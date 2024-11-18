@@ -8,7 +8,7 @@ export type StabilityAIErrorName =
   | 'StabilityAIUnknownError';
 
 export class StabilityAIError extends Error {
-  constructor(status: number, message: string, data?: any) {
+  constructor(status: number, message: string, data?: object) {
     let dataMessage: string;
 
     try {

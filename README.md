@@ -35,7 +35,6 @@ All images passed to this library must be in the format of a local filepath or a
 ### Generation (v1)
 - [Text to Image](#text-to-image)
 - [Image to Image](#image-to-image)
-- [Image to Image - Upscale](#image-to-image---upscale)
 - [Image to Image - Masking](#image-to-image---masking)
 
 ### 3D (v2beta)
@@ -97,7 +96,7 @@ console.log('Engine list:', engines);
 
 ```typescript
 const results = await stability.v1.generation.textToImage(
-  'stable-diffusion-xl-beta-v2-2-2', 
+  'stable-diffusion-xl-1024-v1-0', 
   [
     { text: 'a man on a horse', weight: 0.5 }
   ]
@@ -112,7 +111,7 @@ for (const result of results) {
 
 ```typescript
 const results = await stability.v1.generation.imageToImage(
-  'stable-diffusion-xl-beta-v2-2-2', 
+  'stable-diffusion-xl-1024-v1-0', 
   [
     { text: 'crazy techincolor surprise', weight: 0.5 }
   ],
@@ -124,26 +123,11 @@ for (const result of results) {
 }
 ```
 
-### Image to Image - Upscale
-
-```typescript
-const results = await stability.v1.generation.imageToImageUpscale(
-  'https://www.example.com/images/your-image.jpg',
-  {
-    type: 'esrgan'
-  }
-)
-
-for (const result of results) {
-  console.log('Image to image upscale result filepath:', result.filepath);
-}
-```
-
 ### Image to Image - Masking
 
 ```typescript
 const results = await stability.v1.generation.imageToImageMasking(
-  'stable-diffusion-xl-beta-v2-2-2', 
+  'stable-diffusion-xl-1024-v1-0', 
   [
     { text: 'a beautiful ocean', weight: 0.5 }
   ],

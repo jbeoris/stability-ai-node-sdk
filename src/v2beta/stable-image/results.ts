@@ -2,7 +2,7 @@ import axios from 'axios';
 import {
   APIVersion,
   StabilityAIContentResponse,
-  StabilityAIStatusResult
+  StabilityAIStatusResult,
 } from '../../util';
 import { StabilityAIError } from '../../error';
 import * as Util from '../../util';
@@ -14,13 +14,11 @@ enum Endpoint {
   FETCH_ASYNC_GENERATION_RESULT = '',
 }
 
-export type FetchAsyncGenerationResultRequest = [
-  id: string
-];
+export type FetchAsyncGenerationResultRequest = [id: string];
 
-export type FetchAsyncGenerationResultResponse = 
-| StabilityAIContentResponse
-| StabilityAIStatusResult;
+export type FetchAsyncGenerationResultResponse =
+  | StabilityAIContentResponse
+  | StabilityAIStatusResult;
 
 /**
  * Fetch the result of an async generation by ID
@@ -35,14 +33,17 @@ export async function fetchAsyncGenerationResult(
 ): Promise<FetchAsyncGenerationResultResponse> {
   const [id] = args;
 
-  let response = await axios.get(
-    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, Endpoint.FETCH_ASYNC_GENERATION_RESULT) +
-    `/${id}`,
+  const response = await axios.get(
+    Util.makeUrl(
+      APIVersion.V2_BETA,
+      RESOURCE,
+      Endpoint.FETCH_ASYNC_GENERATION_RESULT,
+    ) + `/${id}`,
     {
       validateStatus: undefined,
       headers: {
         ...this.authHeaders,
-        Accept: 'application/json; type=image/png'
+        Accept: 'application/json; type=image/png',
       },
     },
   );

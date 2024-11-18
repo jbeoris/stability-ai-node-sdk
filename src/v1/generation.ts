@@ -16,12 +16,8 @@ enum Endpoint {
 }
 
 export type EngineId =
-  | 'esrgan-v1-x2plus'
-  | 'stable-diffusion-xl-1024-v0-9'
-  | 'stable-diffusion-xl-1024-v1-0'
   | 'stable-diffusion-v1-6'
-  | 'stable-diffusion-512-v2-1'
-  | 'stable-diffusion-xl-beta-v2-2-2';
+  | 'stable-diffusion-xl-1024-v1-0';
 export type ClipGuidancePreset =
   | 'FAST_BLUE'
   | 'FAST_GREEN'
@@ -211,77 +207,6 @@ export async function imageToImage(
   );
 }
 
-export type ImageToImageUpscaleOptions = [
-  image: string,
-  options: (
-    | {
-        type: 'esrgan';
-      }
-    | {
-        type: 'latent';
-        text_prompts?: TextPrompt[];
-        seed?: number;
-        steps?: number;
-        cfg_scale?: number;
-      }
-  ) & {
-    height?: number;
-    width?: number;
-  },
-];
-
-/**
- * Stability AI Image To Image Upscale (v1)
- *
- */
-export async function imageToImageUpscale(
-  this: StabilityAI,
-  ...args: ImageToImageUpscaleOptions
-): Promise<StabilityAIContentResponse[]> {
-  const [image, options] = args;
-  const imagePath = new Util.ImagePath(image);
-
-  const { type, ...typeOptions } = options;
-
-  const engineId =
-    type === 'esrgan'
-      ? 'esrgan-v1-x2plus'
-      : 'stable-diffusion-x4-latent-upscaler';
-
-  const formData: any = {
-    image: fs.createReadStream(await imagePath.filepath()),
-    ...typeOptions,
-  };
-
-  const response = await axios.postForm(
-    Util.makeUrl(
-      APIVersion.V1,
-      RESOURCE,
-      engineId + '/' + Endpoint.IMAGE_TO_IMAGE_UPSCALE,
-    ),
-    axios.toFormData(formData, new FormData()),
-    {
-      validateStatus: undefined,
-      headers: {
-        ...this.authHeaders,
-        Accept: 'application/json',
-      },
-    },
-  );
-
-  imagePath.cleanup();
-
-  if (response.status === 200 && Array.isArray(response.data.artifacts)) {
-    return processArtifacts(response.data.artifacts);
-  }
-
-  throw new StabilityAIError(
-    response.status,
-    'Failed to run image to image upscale',
-    response.data,
-  );
-}
-
 export type ImageToImageMaskingOptions = [
   ...V1GenerationRequiredParams,
   init_image: string,
@@ -312,7 +237,7 @@ export async function imageToImageMasking(
 
   if ('mask_image' in options) {
     maskPath = new Util.ImagePath(options.mask_image);
-    const { mask_image, ...other } = options;
+    const { ...other } = options;
     otherOptions = other;
   } else {
     const { ...other } = options;

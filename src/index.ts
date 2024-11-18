@@ -63,10 +63,6 @@ class StabilityAI {
           ...args: V1Generation.ImageToImageOptions
         ): Promise<StabilityAIContentResponse[]> =>
           V1Generation.imageToImage.bind(this)(...args),
-        imageToImageUpscale: (
-          ...args: V1Generation.ImageToImageUpscaleOptions
-        ): Promise<StabilityAIContentResponse[]> =>
-          V1Generation.imageToImageUpscale.bind(this)(...args),
         imageToImageMasking: (
           ...args: V1Generation.ImageToImageMaskingOptions
         ): Promise<StabilityAIContentResponse[]> =>
@@ -132,7 +128,9 @@ class StabilityAI {
           replaceBackgroundAndRelight: (
             ...args: V2BetaStableImageEdit.ReplaceBackgroundAndRelightRequest
           ): Promise<V2BetaStableImageEdit.ReplaceBackgroundAndRelightResponse> =>
-            V2BetaStableImageEdit.replaceBackgroundAndRelight.bind(this)(...args),
+            V2BetaStableImageEdit.replaceBackgroundAndRelight.bind(this)(
+              ...args,
+            ),
         },
         generate: {
           ultra: (
@@ -152,7 +150,9 @@ class StabilityAI {
           fetchAsyncGenerationResult: (
             ...args: V2BetaStableImageResults.FetchAsyncGenerationResultRequest
           ): Promise<V2BetaStableImageResults.FetchAsyncGenerationResultResponse> =>
-            V2BetaStableImageResults.fetchAsyncGenerationResult.bind(this)(...args),
+            V2BetaStableImageResults.fetchAsyncGenerationResult.bind(this)(
+              ...args,
+            ),
         },
         upscale: {
           conservative: (

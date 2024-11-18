@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import path from 'path';
 import os from 'os';
 import fs from 'fs-extra';
@@ -45,7 +45,7 @@ export function isValidHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
     return url.protocol === 'http:' || url.protocol === 'https:';
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -53,7 +53,7 @@ export function isValidHttpUrl(value: string): boolean {
 export function isValidFile(value: string): boolean {
   try {
     return fs.statSync(value).isFile();
-  } catch (err) {
+  } catch {
     return false;
   }
 }
@@ -97,6 +97,7 @@ export class ImagePath {
           fs.unlinkSync(this.downloadFilepath);
           this.downloadFilepath = undefined;
         }
+        break;
       }
       default: {
         break;
@@ -110,7 +111,7 @@ export class ImagePath {
  *
  * @param url
  * @returns filepath string
- * 
+ *
  * TODO - image type validation and use corresponding image filetype in filename
  */
 export async function downloadImage(url: string) {
@@ -122,7 +123,7 @@ export async function downloadImage(url: string) {
     responseType: 'stream',
   });
   await fs.ensureDir(path.dirname(filepath));
-  await new Promise(async (resolve, reject) => {
+  await new Promise((resolve, reject) => {
     try {
       response.data
         .pipe(fs.createWriteStream(filepath))
@@ -161,7 +162,6 @@ export async function processContentResponse(
   outputFormat: OutputFormat | 'mp4',
   resource: string,
 ): Promise<StabilityAIContentResponse> {
-  console.log(data);
   let fileData = outputFormat === 'mp4' ? data.video : data.image;
   if (!fileData) fileData = data.base64;
   if (!fileData && data.result) fileData = data.result;
