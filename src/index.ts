@@ -6,6 +6,7 @@ import * as V2BetaStableVideoImageToVideo from './v2beta/stable-video/image-to-v
 import * as V2BetaStableImageControl from './v2beta/stable-image/control';
 import * as V2BetaStableImageEdit from './v2beta/stable-image/edit';
 import * as V2BetaStableImageGenerate from './v2beta/stable-image/generate';
+import * as V2BetaStableImageResults from './v2beta/stable-image/results';
 import * as V2BetaStableImageUpscale from './v2beta/stable-image/upscale';
 import { StabilityAIContentResponse } from './util';
 
@@ -128,6 +129,10 @@ class StabilityAI {
             ...args: V2BetaStableImageEdit.RemoveBackgroundRequest
           ): Promise<StabilityAIContentResponse> =>
             V2BetaStableImageEdit.removeBackground.bind(this)(...args),
+          replaceBackgroundAndRelight: (
+            ...args: V2BetaStableImageEdit.ReplaceBackgroundAndRelightRequest
+          ): Promise<V2BetaStableImageEdit.ReplaceBackgroundAndRelightResponse> =>
+            V2BetaStableImageEdit.replaceBackgroundAndRelight.bind(this)(...args),
         },
         generate: {
           ultra: (
@@ -142,6 +147,12 @@ class StabilityAI {
             ...args: V2BetaStableImageGenerate.SD3Request
           ): Promise<StabilityAIContentResponse> =>
             V2BetaStableImageGenerate.sd3.bind(this)(...args),
+        },
+        results: {
+          fetchAsyncGenerationResult: (
+            ...args: V2BetaStableImageResults.FetchAsyncGenerationResultRequest
+          ): Promise<V2BetaStableImageResults.FetchAsyncGenerationResultResponse> =>
+            V2BetaStableImageResults.fetchAsyncGenerationResult.bind(this)(...args),
         },
         upscale: {
           conservative: (

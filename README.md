@@ -55,6 +55,7 @@ All images passed to this library must be in the format of a local filepath or a
 - [Edit - Outpaint](#edit---outpaint)
 - [Edit - Search and Replace](#edit---search-and-replace)
 - [Edit - Remove Background](#edit---remove-background)
+- [Edit - Replace Background and Relight](#edit---replace-background-and-relight)
 - [Control - Sketch](#control---sketch)
 - [Control - Structure](#control---structure)
 - [Control - Style](#control---style)
@@ -319,6 +320,44 @@ const result = await stability.v2beta.stableImage.edit.removeBackground(
 );
 
 console.log('Stable Image Edit Remove Background result filepath:', result.filepath);
+```
+
+### Edit - Replace Background and Relight
+
+```typescript
+const result = await stability.v2beta.stableImage.edit.replaceBackgroundAndRelight(
+  LOCAL_TEST_FILES.bird,
+  {
+    backgroundPrompt: 'a beautiful sunset',
+    foregroundPrompt: 'enhance lighting',
+    lightSourceDirection: 'above',
+    lightSourceStrength: 0.7,
+  },
+);
+
+
+let filepath: string | undefined = undefined;
+
+while (!filepath) {
+  const relightResult =
+    await stability.v2beta.stableImage.results.fetchAsyncGenerationResult(
+      result.id,
+    );
+
+  if ('filepath' in relightResult) {
+    filepath = relightResult.filepath;
+  } else if (
+    'status' in relightResult &&
+    relightResult.status === 'in-progress'
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+  }
+}
+
+console.log(
+  'Stable Image Edit Replace Background and Relight result filepath:',
+  filepath,
+);
 ```
 
 ### Control - Sketch

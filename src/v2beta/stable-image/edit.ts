@@ -388,3 +388,98 @@ export async function removeBackground(
     response.data,
   );
 }
+
+export type ReplaceBackgroundAndRelightRequest = [
+  image: string,
+  options?: {
+    backgroundPrompt?: string;
+    backgroundReference?: string;
+    foregroundPrompt?: string;
+    negativePrompt?: string;
+    preserveOriginalSubject?: number;
+    originalBackgroundDepth?: number;
+    keepOriginalBackground?: boolean;
+    lightSourceDirection?: 'above' | 'below' | 'left' | 'right';
+    lightReference?: string;
+    lightSourceStrength?: number;
+    seed?: number;
+    outputFormat?: OutputFormat;
+  },
+];
+
+export type ReplaceBackgroundAndRelightResponse = {
+  id: string;
+};
+
+/**
+ * Stability AI Stable Image Replace Background and Relight (v2beta)
+ *
+ * @param image - Local filepath or public URL of the image containing the subject
+ * @param options - Replace Background and Relight Options
+ */
+export async function replaceBackgroundAndRelight(
+  this: StabilityAI,
+  ...args: ReplaceBackgroundAndRelightRequest
+): Promise<ReplaceBackgroundAndRelightResponse> {
+  const [image, options] = args;
+  const imagePath = new Util.ImagePath(image);
+  const backgroundRefPath = options?.backgroundReference 
+    ? new Util.ImagePath(options.backgroundReference) 
+    : undefined;
+  const lightRefPath = options?.lightReference 
+    ? new Util.ImagePath(options.lightReference) 
+    : undefined;
+
+  const formData: Record<string, any> = {
+    subject_image: fs.createReadStream(await imagePath.filepath()),
+  };
+
+  // Required: either background_reference or background_prompt
+  if (backgroundRefPath) {
+    formData.background_reference = fs.createReadStream(await backgroundRefPath.filepath());
+  }
+  if (options?.backgroundPrompt) {
+    formData.background_prompt = options.backgroundPrompt;
+  }
+
+  // Optional parameters
+  if (options?.foregroundPrompt) formData.foreground_prompt = options.foregroundPrompt;
+  if (options?.negativePrompt) formData.negative_prompt = options.negativePrompt;
+  if (options?.preserveOriginalSubject) formData.preserve_original_subject = options.preserveOriginalSubject;
+  if (options?.originalBackgroundDepth) formData.original_background_depth = options.originalBackgroundDepth;
+  if (options?.keepOriginalBackground) formData.keep_original_background = options.keepOriginalBackground;
+  if (options?.lightSourceDirection) formData.light_source_direction = options.lightSourceDirection;
+  if (lightRefPath) {
+    formData.light_reference = fs.createReadStream(await lightRefPath.filepath());
+  }
+  if (options?.lightSourceStrength) formData.light_source_strength = options.lightSourceStrength;
+  if (options?.seed) formData.seed = options.seed;
+  if (options?.outputFormat) formData.output_format = options.outputFormat;
+
+  const response = await axios.postForm(
+    Util.makeUrl(APIVersion.V2_BETA, RESOURCE, 'replace-background-and-relight'),
+    axios.toFormData(formData, new FormData()),
+    {
+      validateStatus: undefined,
+      headers: {
+        ...this.authHeaders,
+        Accept: 'application/json',
+      },
+    },
+  );
+
+  // Cleanup temporary files
+  imagePath.cleanup();
+  backgroundRefPath?.cleanup();
+  lightRefPath?.cleanup();
+
+  if (response.status === 200 && typeof response.data.id === 'string') {
+    return { id: response.data.id };
+  }
+
+  throw new StabilityAIError(
+    response.status,
+    'Failed to run stable image replace background and relight',
+    response.data,
+  );
+}

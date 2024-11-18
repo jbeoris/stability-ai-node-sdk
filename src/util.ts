@@ -110,6 +110,8 @@ export class ImagePath {
  *
  * @param url
  * @returns filepath string
+ * 
+ * TODO - image type validation and use corresponding image filetype in filename
  */
 export async function downloadImage(url: string) {
   const filename = `image-${uuidv4()}.png`;
@@ -159,8 +161,10 @@ export async function processContentResponse(
   outputFormat: OutputFormat | 'mp4',
   resource: string,
 ): Promise<StabilityAIContentResponse> {
+  console.log(data);
   let fileData = outputFormat === 'mp4' ? data.video : data.image;
   if (!fileData) fileData = data.base64;
+  if (!fileData && data.result) fileData = data.result;
   if (!fileData) throw new Error('No file data found in response');
   const finishReason: 'SUCCESS' | 'CONTENT_FILTERED' | 'ERROR' =
     data.finish_reason;
